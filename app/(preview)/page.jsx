@@ -19,7 +19,7 @@ async function storageGet(key) {
   } catch { return null; }
 }
 
-async function storageSet(key: string, val: any) {
+async function storageSet(key, val) {
   try { 
     localStorage.setItem(key, JSON.stringify(val)); 
   } catch {}
