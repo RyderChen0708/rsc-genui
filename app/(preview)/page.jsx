@@ -452,7 +452,7 @@ function OrderCard({ order, onShip, onEdit, onDelete }) {
           <span key={s.key} style={{ background:`${s.color}15`, border:`1px solid ${s.color}55`,
             borderRadius:"0.45rem", padding:"0.18rem 0.55rem",
             fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:s.color, fontWeight:600 }}>
-            🍊 {s.label} × {order.qty[s.key]} 箱
+            🍐 {s.label} × {order.qty[s.key]} 箱
           </span>
         ))}
         <span style={{ background:"#F0E8D0", borderRadius:"0.45rem", padding:"0.18rem 0.55rem",
