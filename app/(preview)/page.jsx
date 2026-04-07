@@ -14,17 +14,16 @@ const CUSTOMERS_KEY = "pomelo-customers-v1";
 // ── Storage ─────────────────────────────────────────────
 async function storageGet(key) {
   try { 
-    const r = localStorage.getItem(key); 
+    const r = localStorage.getItem(key);
     return r ? JSON.parse(r) : null; 
   } catch { return null; }
 }
 
 async function storageSet(key, val) {
   try { 
-    localStorage.setItem(key, JSON.stringify(val)); 
+    localStorage.setItem(key, JSON.stringify(val));
   } catch {}
 }
-
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
@@ -85,7 +84,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// ── Confirm Dialog — replaces blocked confirm() ──────────
+// ── Confirm Dialog ───────────────────────────────────────
 function ConfirmDialog({ message, onConfirm, onCancel }) {
   return (
     <div style={{ position:"fixed", inset:0, background:"rgba(15,10,5,0.72)",
@@ -209,19 +208,18 @@ function CustomerManager({ customers, onSave, onClose }) {
     </>
   );
 }
-// ── Add Order Form ───────────────────────────────────────
-function AddOrderForm({ customers, onSave }) {
-  const [name, setName]       = useState("");
-  const [phone, setPhone]     = useState("");
-  const [address, setAddress] = useState("");
-  const [note, setNote]       = useState("");
-  const [qty, setQty]         = useState({ large:0, medium:0, small:0 });
+
+// ── Order Form (新增與編輯共用) ───────────────────────────
+function OrderForm({ customers, initialData, onSave }) {
+  const [name, setName]       = useState(initialData?.name || "");
+  const [phone, setPhone]     = useState(initialData?.phone || "");
+  const [address, setAddress] = useState(initialData?.address || "");
+  const [note, setNote]       = useState(initialData?.note || "");
+  const [qty, setQty]         = useState(initialData?.qty || { large:0, medium:0, small:0 });
   const [showDrop, setShowDrop] = useState(false);
   const wrapRef = useRef();
 
-  const suggestions = name.trim()
-    ? customers.filter(c => c.name.includes(name.trim()))
-    : customers;
+  const suggestions = name.trim() ? customers.filter(c => c.name.includes(name.trim())) : customers;
   const total = qty.large + qty.medium + qty.small;
 
   function pick(c) {
@@ -231,44 +229,31 @@ function AddOrderForm({ customers, onSave }) {
 
   function handleSave() {
     if (!name.trim() || total === 0) return;
-    onSave({ id:uid(), name:name.trim(), phone:phone.trim(), address:address.trim(),
-      note:note.trim(), qty, trackingNumber:"", shipped:false,
-      shippedAt:null, createdAt:new Date().toISOString() });
+    if (initialData) {
+      onSave({ ...initialData, name:name.trim(), phone:phone.trim(), address:address.trim(), note:note.trim(), qty });
+    } else {
+      onSave({ id:uid(), name:name.trim(), phone:phone.trim(), address:address.trim(), note:note.trim(), qty, trackingNumber:"", shipped:false, shippedAt:null, createdAt:new Date().toISOString() });
+    }
   }
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"0.85rem" }}>
-
-      {/* Name + dropdown */}
       <div style={{ position:"relative" }} ref={wrapRef}>
         <label style={S.label}>買家姓名 *</label>
-        <input style={S.input} value={name} autoComplete="off"
-          onChange={e => { setName(e.target.value); setShowDrop(true); }}
-          onFocus={() => setShowDrop(true)}
-          placeholder="輸入或選擇客戶" />
+        <input style={S.input} value={name} autoComplete="off" onChange={e => { setName(e.target.value); setShowDrop(true); }} onFocus={() => setShowDrop(true)} placeholder="輸入或選擇客戶" />
         {showDrop && suggestions.length > 0 && (
-          <div style={{ position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:200,
-            background:"white", border:"1.5px solid #D4A050", borderRadius:"0.7rem",
-            boxShadow:"0 8px 24px rgba(0,0,0,0.14)", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:200, background:"white", border:"1.5px solid #D4A050", borderRadius:"0.7rem", boxShadow:"0 8px 24px rgba(0,0,0,0.14)", overflow:"hidden" }}>
             {suggestions.map(c => (
-              <div key={c.id} onMouseDown={e => { e.preventDefault(); pick(c); }}
-                style={{ padding:"0.6rem 0.85rem", cursor:"pointer",
-                  borderBottom:"1px solid #F0E8D0", fontFamily:"'Noto Sans TC'" }}
-                onMouseEnter={e => e.currentTarget.style.background="#FFF8EC"}
-                onMouseLeave={e => e.currentTarget.style.background="white"}>
+              <div key={c.id} onMouseDown={e => { e.preventDefault(); pick(c); }} style={{ padding:"0.6rem 0.85rem", cursor:"pointer", borderBottom:"1px solid #F0E8D0", fontFamily:"'Noto Sans TC'" }}>
                 <div style={{ fontWeight:700, color:"#3A2205", fontSize:"0.9rem" }}>{c.name}</div>
                 {c.phone && <div style={{ fontSize:"0.74rem", color:"#9A7040" }}>📞 {c.phone}</div>}
-                {c.address && <div style={{ fontSize:"0.74rem", color:"#9A7040" }}>📍 {c.address}</div>}
               </div>
             ))}
           </div>
         )}
       </div>
-      {/* invisible overlay to close dropdown on outside click */}
-      {showDrop && suggestions.length > 0 && (
-        <div style={{ position:"fixed", inset:0, zIndex:199 }} onClick={() => setShowDrop(false)} />
-      )}
-
+      {showDrop && suggestions.length > 0 && <div style={{ position:"fixed", inset:0, zIndex:199 }} onClick={() => setShowDrop(false)} />}
+      
       <div>
         <label style={S.label}>聯絡電話</label>
         <input style={S.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="0912-345-678" />
@@ -282,23 +267,13 @@ function AddOrderForm({ customers, onSave }) {
         <label style={S.label}>箱數（依柚子大小）</label>
         <div style={{ display:"flex", gap:"0.6rem" }}>
           {SIZES.map(s => (
-            <div key={s.key} style={{ flex:1, background:"#FFF8EC",
-              border:`1.5px solid ${s.color}33`, borderRadius:"0.75rem",
-              padding:"0.7rem 0.4rem", textAlign:"center" }}>
+            <div key={s.key} style={{ flex:1, background:"#FFF8EC", border:`1.5px solid ${s.color}33`, borderRadius:"0.75rem", padding:"0.7rem 0.4rem", textAlign:"center" }}>
               <div style={{ fontSize:"1.3rem", lineHeight:1 }}>🍊</div>
-              <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color,
-                fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
+              <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.2rem" }}>
-                <button onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))}
-                  style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`,
-                    background:"white", cursor:"pointer", color:s.color, fontWeight:700,
-                    fontSize:"0.9rem", lineHeight:1, padding:0 }}>−</button>
-                <span style={{ fontFamily:"monospace", fontSize:"1rem", minWidth:18,
-                  textAlign:"center", color:"#3A2205", fontWeight:700 }}>{qty[s.key]}</span>
-                <button onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))}
-                  style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`,
-                    background:"white", cursor:"pointer", color:s.color, fontWeight:700,
-                    fontSize:"0.9rem", lineHeight:1, padding:0 }}>＋</button>
+                <button onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>−</button>
+                <span style={{ fontFamily:"monospace", fontSize:"1rem", minWidth:18, textAlign:"center", color:"#3A2205", fontWeight:700 }}>{qty[s.key]}</span>
+                <button onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>＋</button>
               </div>
             </div>
           ))}
@@ -310,11 +285,9 @@ function AddOrderForm({ customers, onSave }) {
         <input style={S.input} value={note} onChange={e => setNote(e.target.value)} placeholder="付款備註、特殊需求..." />
       </div>
 
-      <button onClick={handleSave} disabled={total === 0 || !name.trim()} style={{
-        ...S.btnPrimary,
-        background: total > 0 && name.trim() ? "linear-gradient(135deg,#D4850A,#B8600A)" : "#CCC",
-        cursor: total > 0 && name.trim() ? "pointer" : "not-allowed",
-      }}>新增訂單</button>
+      <button onClick={handleSave} disabled={total === 0 || !name.trim()} style={{ ...S.btnPrimary, background: total > 0 && name.trim() ? "linear-gradient(135deg,#D4850A,#B8600A)" : "#CCC", cursor: total > 0 && name.trim() ? "pointer" : "not-allowed" }}>
+        {initialData ? "儲存修改" : "新增訂單"}
+      </button>
     </div>
   );
 }
@@ -329,14 +302,35 @@ function ScanModal({ order, onSaved, onClose }) {
   async function handleFile(e) {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = async ev => {
-      const url = ev.target.result;
-      setPreview(url); setStep("scanning");
-      const result = await ocr(url.split(",")[1]);
-      setTracking(result === "找不到" ? "" : result);
-      setStep("confirm");
+    reader.onload = ev => {
+      setPreview(ev.target.result);
+      setStep("preview");
     };
     reader.readAsDataURL(file);
+    e.target.value = null;
+  }
+
+  function rotateImage() {
+    if (!preview) return;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.height;
+      canvas.height = img.width;
+      const ctx = canvas.getContext("2d");
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(img, -img.width / 2, -img.height / 2);
+      setPreview(canvas.toDataURL("image/jpeg"));
+    };
+    img.src = preview;
+  }
+
+  async function startOCR() {
+    setStep("scanning");
+    const result = await ocr(preview.split(",")[1]);
+    setTracking(result === "找不到" ? "" : result);
+    setStep("confirm");
   }
 
   function confirm() {
@@ -367,6 +361,27 @@ function ScanModal({ order, onSaved, onClose }) {
           cursor: tracking.trim() ? "pointer" : "not-allowed" }}>確認並標記已寄送</button>
       </>)}
 
+      {step === "preview" && (
+        <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:"0.8rem" }}>
+          <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", fontSize:"0.88rem", fontWeight:600, textAlign:"center" }}>
+            確認照片方向與清晰度
+          </div>
+          <img src={preview} style={{ width:"100%", maxHeight:250, objectFit:"contain", borderRadius:"0.75rem", border:"1px solid #E8D4A0", background:"#FFFDF7" }} />
+          <div style={{ display:"flex", gap:"0.5rem" }}>
+            <button onClick={() => fileRef.current.click()} style={{ flex:1, padding:"0.6rem", borderRadius:"0.55rem", border:"1.5px solid #D4A050", background:"white", color:"#8A6530", fontFamily:"'Noto Sans TC'", fontWeight:600, cursor:"pointer" }}>
+              重新選擇
+            </button>
+            <button onClick={rotateImage} style={{ flex:1, padding:"0.6rem", borderRadius:"0.55rem", border:"1.5px solid #D4A050", background:"white", color:"#8A6530", fontFamily:"'Noto Sans TC'", fontWeight:600, cursor:"pointer" }}>
+              🔄 旋轉 90°
+            </button>
+          </div>
+          <button onClick={startOCR} style={{ ...S.btnPrimary, marginTop:"0.4rem" }}>
+            ✨ 確認無誤，開始 AI 辨識
+          </button>
+          <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleFile} />
+        </div>
+      )}
+
       {step === "scanning" && (
         <div style={{ padding:"2.5rem", textAlign:"center" }}>
           <div style={{ fontSize:"2rem" }}>⏳</div>
@@ -382,7 +397,7 @@ function ScanModal({ order, onSaved, onClose }) {
         </div>
         <button onClick={confirm} disabled={!tracking.trim()} style={{ ...S.btnPrimary,
           background: tracking.trim() ? "linear-gradient(135deg,#2E8B57,#1F6B3F)" : "#CCC",
-          cursor: tracking.trim() ? "pointer" : "not-allowed" }}>✅ 確認標記已寄送</button>
+         cursor: tracking.trim() ? "pointer" : "not-allowed" }}>✅ 確認標記已寄送</button>
       </>)}
 
       {step === "done" && (
@@ -394,11 +409,11 @@ function ScanModal({ order, onSaved, onClose }) {
       )}
     </div>
   );
-          }
+}
 
 
 // ── Order Card ───────────────────────────────────────────
-function OrderCard({ order, onShip, onDelete }) {
+function OrderCard({ order, onShip, onEdit, onDelete }) {
   const total = order.qty.large + order.qty.medium + order.qty.small;
   const shippedDate = order.shippedAt ? new Date(order.shippedAt).toLocaleDateString("zh-TW") : null;
   const createdDate = new Date(order.createdAt).toLocaleDateString("zh-TW");
@@ -425,13 +440,13 @@ function OrderCard({ order, onShip, onDelete }) {
           {order.phone && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>📞 {order.phone}</div>}
           {order.address && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'" }}>📍 {order.address}</div>}
         </div>
-        <button onClick={() => onDelete(order.id)}
-          style={{ marginLeft:"0.5rem", flexShrink:0, padding:"0.28rem 0.65rem",
-            borderRadius:"0.45rem", border:"1.5px solid #E8B0A0",
-            background:"#FFF0EC", color:"#C0402A", fontFamily:"'Noto Sans TC'",
-            fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>刪除</button>
+        <div style={{ display:"flex", gap:"0.4rem", flexShrink:0, marginLeft:"0.5rem" }}>
+          <button onClick={() => onEdit(order)} style={{ padding:"0.28rem 0.65rem", borderRadius:"0.45rem", border:"1.5px solid #D4A050", background:"white", color:"#A07020", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>編輯</button>
+          <button onClick={() => onDelete(order.id)} style={{ padding:"0.28rem 0.65rem", borderRadius:"0.45rem", border:"1.5px solid #E8B0A0", background:"#FFF0EC", color:"#C0402A", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>刪除</button>
+        </div>
       </div>
 
+      
       <div style={{ display:"flex", gap:"0.45rem", marginTop:"0.65rem", flexWrap:"wrap" }}>
         {SIZES.map(s => order.qty[s.key] > 0 && (
           <span key={s.key} style={{ background:`${s.color}15`, border:`1px solid ${s.color}55`,
@@ -461,7 +476,7 @@ function OrderCard({ order, onShip, onDelete }) {
             style={{ fontSize:"0.76rem", color:"#D4850A", fontFamily:"'Noto Sans TC'",
               fontWeight:600, textDecoration:"none", background:"#FFF0D0",
               padding:"0.18rem 0.55rem", borderRadius:"0.4rem", border:"1px solid #E8C070" }}>
-            🔍 查詢貨況
+             🔍 查詢貨況
           </a>
         </div>
       )}
@@ -501,14 +516,22 @@ export default function App() {
     const updated = [order, ...orders];
     setOrders(updated); await storageSet(ORDERS_KEY, updated); setModal(null);
   }
+
+  async function handleEditOrder(updatedOrder) {
+    const updated = orders.map(o => o.id === updatedOrder.id ? updatedOrder : o);
+    setOrders(updated); await storageSet(ORDERS_KEY, updated); setModal(null);
+  }
+
   async function handleSaveShipped(upd) {
     const updated = orders.map(o => o.id === upd.id ? upd : o);
     setOrders(updated); await storageSet(ORDERS_KEY, updated);
   }
+
   async function handleDeleteConfirmed(id) {
     const updated = orders.filter(o => o.id !== id);
     setOrders(updated); await storageSet(ORDERS_KEY, updated); setModal(null);
   }
+
   async function handleSaveCustomers(list) {
     setCustomers(list); await storageSet(CUSTOMERS_KEY, list);
   }
@@ -534,7 +557,7 @@ export default function App() {
         * { box-sizing:border-box; } body { margin:0; }
       `}</style>
 
-      {/* Header */}
+           {/* Header */}
       <div style={{ background:"linear-gradient(135deg,#8B4513,#A0522D,#6B3410)",
         padding:"1.1rem 1.1rem 0.9rem", boxShadow:"0 4px 20px rgba(80,30,0,0.25)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -588,7 +611,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* List */}
+            {/* List */}
       <div style={{ padding:"0.65rem 0.8rem 5rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
         {loading && <div style={{ textAlign:"center", padding:"3rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>載入中...</div>}
         {!loading && filtered.length === 0 && (
@@ -600,6 +623,7 @@ export default function App() {
         {filtered.map(order => (
           <OrderCard key={order.id} order={order}
             onShip={o => setModal({ type:"ship", order:o })}
+            onEdit={o => setModal({ type:"edit", order:o })}
             onDelete={id => setModal({ type:"confirmDelete", id })} />
         ))}
       </div>
@@ -607,7 +631,12 @@ export default function App() {
       {/* Modals */}
       {modal === "add" && (
         <Modal title="新增訂單" onClose={() => setModal(null)}>
-          <AddOrderForm customers={customers} onSave={handleAddOrder} />
+          <OrderForm customers={customers} onSave={handleAddOrder} />
+        </Modal>
+      )}
+      {modal?.type === "edit" && (
+        <Modal title="編輯訂單" onClose={() => setModal(null)}>
+          <OrderForm customers={customers} initialData={modal.order} onSave={handleEditOrder} />
         </Modal>
       )}
       {modal === "customers" && (
