@@ -563,7 +563,7 @@ export default function App() {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1.3rem",
-              fontWeight:900, color:"#FFE88A", letterSpacing:"0.04em" }}>🍐 陳家文旦管理後台</div>
+              fontWeight:800, color:"#FFE88A", letterSpacing:"0.04em" }}>🍐陳家文旦管理後台</div>
             <div style={{ fontSize:"0.72rem", color:"#D4B87A", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
               共 {stats.total} 筆 · 待寄送 {stats.pending} 筆
             </div>
