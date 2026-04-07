@@ -588,7 +588,7 @@ export default function App() {
         {[["大顆",stats.large,"#C8820A"],["普通",stats.medium,"#D4680A"],["小顆",stats.small,"#B83A20"]].map(([l,v,c]) => (
           <div key={l} style={{ background:"white", borderRadius:"0.75rem", padding:"0.6rem 0.4rem",
             textAlign:"center", border:`1.5px solid ${c}25`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)" }}>
-            <div style={{ fontSize:"0.68rem", color:c, fontWeight:700, fontFamily:"'Noto Sans TC'" }}>🍊 {l}</div>
+            <div style={{ fontSize:"0.68rem", color:c, fontWeight:700, fontFamily:"'Noto Sans TC'" }}>🍐 {l}</div>
             <div style={{ fontSize:"1.4rem", fontWeight:900, color:"#3A2205", fontFamily:"'Noto Serif TC'" }}>{v}</div>
             <div style={{ fontSize:"0.66rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>箱</div>
           </div>
