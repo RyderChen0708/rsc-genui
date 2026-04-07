@@ -12,7 +12,7 @@ const ORDERS_KEY    = "pomelo-orders-v2";
 const CUSTOMERS_KEY = "pomelo-customers-v1";
 
 // ── Storage ─────────────────────────────────────────────
-async function storageGet(key: string) {
+async function storageGet(key) {
   try { 
     const r = localStorage.getItem(key); 
     return r ? JSON.parse(r) : null; 
