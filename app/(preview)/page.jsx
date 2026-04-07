@@ -264,11 +264,11 @@ function OrderForm({ customers, initialData, onSave }) {
       </div>
 
       <div>
-        <label style={S.label}>箱數（依柚子大小）</label>
+        <label style={S.label}>箱數（依文旦大小）</label>
         <div style={{ display:"flex", gap:"0.6rem" }}>
           {SIZES.map(s => (
             <div key={s.key} style={{ flex:1, background:"#FFF8EC", border:`1.5px solid ${s.color}33`, borderRadius:"0.75rem", padding:"0.7rem 0.4rem", textAlign:"center" }}>
-              <div style={{ fontSize:"1.3rem", lineHeight:1 }}>🍊</div>
+              <div style={{ fontSize:"1.3rem", lineHeight:1 }}>🍐</div>
               <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.2rem" }}>
                 <button onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>−</button>
@@ -563,7 +563,7 @@ export default function App() {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1.3rem",
-              fontWeight:900, color:"#FFE88A", letterSpacing:"0.04em" }}>🍊 柚子管理後台</div>
+              fontWeight:900, color:"#FFE88A", letterSpacing:"0.04em" }}>🍐 陳家文旦管理後台</div>
             <div style={{ fontSize:"0.72rem", color:"#D4B87A", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
               共 {stats.total} 筆 · 待寄送 {stats.pending} 筆
             </div>
