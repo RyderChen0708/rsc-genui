@@ -12,7 +12,7 @@ const ORDERS_KEY    = "pomelo-orders-v2";
 const CUSTOMERS_KEY = "pomelo-customers-v1";
 
 // ── Storage ─────────────────────────────────────────────
-async function storageGet(key) {
+async function storageGet(key: string) {
   try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; }
   catch { return null; }
 }
