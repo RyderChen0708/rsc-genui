@@ -13,12 +13,19 @@ const CUSTOMERS_KEY = "pomelo-customers-v1";
 
 // ── Storage ─────────────────────────────────────────────
 async function storageGet(key: string) {
-  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; }
-  catch { return null; }
+  try { 
+    const r = localStorage.getItem(key); 
+    return r ? JSON.parse(r) : null; 
+  } catch { return null; }
 }
-async function storageSet(key, val) {
-  try { await window.storage.set(key, JSON.stringify(val)); } catch {}
+
+async function storageSet(key: string, val: any) {
+  try { 
+    localStorage.setItem(key, JSON.stringify(val)); 
+  } catch {}
 }
+
+
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
 // ── Claude OCR ──────────────────────────────────────────
