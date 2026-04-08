@@ -293,7 +293,10 @@ function OrderForm({ customers, initialData, onSave }) {
                     setQty(q => ({ ...q, [s.key]: isNaN(val) ? 0 : val }));
                   }} 
                   // width 從 2.2rem 加大到 3.5rem，字體稍微調大到 1.1rem
-                  style={{ width:"3.5rem", fontFamily:"monospace", fontSize:"1.1rem", textAlign:"center", color:"#3A2205", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0 }} 
+                  style={{ width:"3.5rem", fontFamily:"monospace", fontSize:"1.1rem", textAlign:"center", color:"#3A2205", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0,WebkitUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    userSelect: "none" }} 
                 />
 
                 <button onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>＋</button>
