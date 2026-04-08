@@ -274,7 +274,9 @@ function OrderForm({ customers, initialData, onSave }) {
        <div style={{ display:"flex", gap:"0.35rem" }}>
           {SIZES.map(s => (
             <div key={s.key} style={{ flex:1, background:"#F0FFF4", border:`1.5px solid ${s.color}33`, borderRadius:"0.6rem", padding:"0.6rem 0.2rem", textAlign:"center", minWidth:0 }}>
-              <div style={{ fontSize:"1.3rem", lineHeight:1 }}>🍐</div>
+              <div style={{ lineHeight:1 }}>
+  <img src="/pomelo-icon.png" alt="文旦" style={{ width:"1.6rem", height:"1.6rem", objectFit:"contain" }} />
+</div>
               <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.1rem" }}>
                 {/* 加入 type="button" 且微調寬度為 24px，加入 flexShrink:0 防止變形 */}
@@ -568,7 +570,8 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
       <div style={{ display:"flex", gap:"0.45rem", marginTop:"0.65rem", flexWrap:"wrap" }}>
         {SIZES.map(s => order.qty[s.key] > 0 && (
           <span key={s.key} style={{ background:`${s.color}15`, border:`1px solid ${s.color}55`, borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:s.color, fontWeight:600 }}>
-            🍐 {s.label} × {order.qty[s.key]} 箱
+            <img src="/pomelo-icon.png" alt="文旦" style={{ width:"0.9rem", height:"0.9rem", verticalAlign:"middle", marginRight:"0.1rem", position:"relative", top:"-1px" }} /> 
+{s.label} × {order.qty[s.key]} 箱
           </span>
         ))}
         <span style={{ background:"#D8F3DC", borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#2D6A4F", fontWeight:600 }}>共 {total} 箱</span>
