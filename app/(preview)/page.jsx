@@ -269,7 +269,7 @@ function OrderForm({ customers, initialData, onSave }) {
         <input style={S.input} value={address} onChange={e => setAddress(e.target.value)} placeholder="台北市..." />
       </div>
 
-      <div>
+<div>
         <label style={S.label}>箱數（依文旦大小）</label>
         <div style={{ display:"flex", gap:"0.6rem" }}>
           {SIZES.map(s => (
@@ -278,7 +278,20 @@ function OrderForm({ customers, initialData, onSave }) {
               <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.2rem" }}>
                 <button onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>−</button>
-                <span style={{ fontFamily:"monospace", fontSize:"1rem", minWidth:18, textAlign:"center", color:"#3A2205", fontWeight:700 }}>{qty[s.key]}</span>
+                
+                {/* 👇 這裡把原本的 span 換成了 input，並加上了全選與手動輸入功能 */}
+                <input 
+                  type="number" 
+                  min="0" 
+                  value={qty[s.key]} 
+                  onFocus={e => e.target.select()}
+                  onChange={e => {
+                    let val = parseInt(e.target.value, 10);
+                    setQty(q => ({ ...q, [s.key]: isNaN(val) || val < 0 ? 0 : val }));
+                  }} 
+                  style={{ width:"2.2rem", fontFamily:"monospace", fontSize:"1rem", textAlign:"center", color:"#3A2205", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0 }} 
+                />
+
                 <button onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>＋</button>
               </div>
             </div>
