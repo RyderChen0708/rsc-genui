@@ -9,7 +9,6 @@ export async function GET(request) {
   }
 
   try {
-    // 1. 依照嘉里大榮的格式組裝 Payload
     const payload = {
       trackType: "0",
       trackNo: [
@@ -21,50 +20,58 @@ export async function GET(request) {
       ]
     };
 
-    // 2. 發送 POST 請求到真實的 API
+    // 加上更完整的 Header，徹底偽裝成從嘉里大榮官網發出的請求
     const response = await fetch('https://www.kerrytj.com/api/Tracking/GetTracking', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 加上 User-Agent 偽裝成一般瀏覽器，避免被阻擋
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'Referer': 'https://www.kerrytj.com/zh/search/search_track.aspx',
+        'Origin': 'https://www.kerrytj.com'
       },
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
-
-    // 3. 防呆檢查：如果查無資料
-    if (!data.list || data.list.length === 0 || !data.list[0].course) {
-      return NextResponse.json({ error: '查無此單號或尚未建檔' }, { status: 404 });
+    // 先抓取純文字，避免直接 json() 壞掉
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error(`回傳的不是 JSON，可能是被阻擋了。伺服器回應：${text.substring(0, 100)}`);
     }
 
-    // 4. 解析並整理歷史軌跡 (course 陣列)
+    if (!data.list || data.list.length === 0 || !data.list[0].course) {
+      return NextResponse.json({ error: '查無此單號或尚未建檔', rawData: data }, { status: 404 });
+    }
+
     const courseData = data.list[0].course;
     
     const history = courseData.map(item => {
-      // 處理日期：20260320 -> 2026-03-20
-      const d = item.processCargoCrtDate.toString();
-      const dateStr = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
-      
-      // 處理時間：35701 -> 035701 -> 03:57 (自動補齊 6 位數)
-      const t = item.processCargoCrtTime.toString().padStart(6, '0');
-      const timeStr = `${t.slice(0,2)}:${t.slice(2,4)}`;
+      let timeStrFull = "時間未知";
+      try {
+        // 加入防護機制：確保日期和時間真的存在才處理
+        if (item.processCargoCrtDate && item.processCargoCrtTime != null) {
+          const d = item.processCargoCrtDate.toString();
+          const dateStr = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+          
+          const t = item.processCargoCrtTime.toString().padStart(6, '0');
+          const timeStr = `${t.slice(0,2)}:${t.slice(2,4)}`;
+          timeStrFull = `${dateStr} ${timeStr}`;
+        }
+      } catch(e) {
+        console.error("時間解析錯誤");
+      }
 
       return {
-        time: `${dateStr} ${timeStr}`,
-        // 組合狀態與站所，例如："貨件已到配送站所 (板橋)"
-        message: `${item.statusIdName} (${item.processDepotIdName})`
+        time: timeStrFull,
+        message: `${item.statusIdName || '未知狀態'} (${item.processDepotIdName || '未知站所'})`
       };
     });
 
-    // 確保時間軸是由新到舊排序（從最近發生的事情開始看）
     history.sort((a, b) => new Date(b.time) - new Date(a.time));
-
-    // 取得最新的一筆狀態作為摘要
     const currentStatus = history.length > 0 ? history[0].message : "處理中";
 
-    // 5. 回傳乾淨的 JSON 給我們自己的前端
     return NextResponse.json({
       trackingNumber: no,
       status: currentStatus,
@@ -72,7 +79,10 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    console.error('Tracking API Error:', error);
-    return NextResponse.json({ error: '查詢失敗，系統異常' }, { status: 500 });
+    // 💡 關鍵修改：把真正的錯誤原因 (error.message) 印在畫面上！
+    return NextResponse.json({ 
+      error: '查詢失敗，系統異常', 
+      details: error.message 
+    }, { status: 500 });
   }
 }
