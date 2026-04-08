@@ -729,7 +729,7 @@ export default function App() {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1.3rem",
-              fontWeight:800, color:"#FFFFFF", letterSpacing:"0.04em", display:"flex", alignItems:"center", gap:"0.3rem" }}>
+              fontWeight:800, color:"#2D6A4F", letterSpacing:"0.04em", display:"flex", alignItems:"center", gap:"0.3rem" }}>
   <img src="/pomelo-icon.png" alt="文旦" style={{ width:"1.5rem", height:"1.5rem" }} />
   陳家文旦
 </div>
