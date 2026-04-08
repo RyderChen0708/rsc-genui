@@ -9,7 +9,7 @@ export async function GET(request) {
   }
 
   // 🔑 請記得換成你自己的 17token
-  const API_KEY = "你的_17TRACK_密鑰";
+  const API_KEY = "FAB196B8BDACFA6B5B536BDCD9BE0C78";
   // 🚚 嘉里大榮 (Kerry TJ) 的 17TRACK 運輸商代碼
   const CARRIER_ID = 100704;
 
