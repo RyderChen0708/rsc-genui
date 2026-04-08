@@ -554,7 +554,7 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ display:"flex", alignItems:"center", gap:"0.45rem", flexWrap:"wrap" }}>
             <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem", fontWeight:700, color:"#1B4332" }}>{order.name}</span>
-            <span style={{ fontSize:"0.68rem", fontWeight:700, padding:"0.12rem 0.45rem", borderRadius:"99px", fontFamily:"'Noto Sans TC'", background: order.shipped ? "#2D6A4F" : "#52796F", color:"white" }}>
+            <span style={{ fontSize:"0.68rem", fontWeight:700, padding:"0.12rem 0.45rem", borderRadius:"99px", fontFamily:"'Noto Sans TC'", background: order.shipped ? "#2D6A4F" : "#e31717", color:"white" }}>
               {order.shipped ? "已寄送" : "待寄送"}
             </span>
           </div>
