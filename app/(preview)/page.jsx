@@ -1,6 +1,21 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
-import jsQR from "jsqr"; // 👈 新增：引入 QR Code 掃描套件
+import jsQR from "jsqr"; 
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
+// 👉 請將這裡的內容，替換成你剛剛在 Firebase 複製的金鑰！
+const firebaseConfig = {
+  apiKey: "AIzaSyA0gfZsXBaYQmNJqH8UfeqJ8T2GjNxlHM0",
+  authDomain: "pomelo-manager-df403.firebaseapp.com",
+  projectId: "pomelo-manager-df403",
+  storageBucket: "pomelo-manager-df403.firebasestorage.app",
+  messagingSenderId: "G-XMXKERFH4V",
+  appId: "1:118535587315:web:4380220b015840abadfe86"
+};
+// 初始化 Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // ── Constants ───────────────────────────────────────────
 const SIZES = [
@@ -12,21 +27,27 @@ const KERRY_URL = "https://www.kerrytj.com/zh/checkin";
 const ORDERS_KEY    = "pomelo-orders-v2";
 const CUSTOMERS_KEY = "pomelo-customers-v1";
 
-// ── Storage ─────────────────────────────────────────────
+// ── Storage (全面升級為 Firebase 雲端同步) ───────────────────────────
 async function storageGet(key) {
-  try { 
-    const r = localStorage.getItem(key);
-    return r ? JSON.parse(r) : null; 
-  } catch { return null; }
+  try {
+    const docSnap = await getDoc(doc(db, "pomelo_data", key));
+    return docSnap.exists() ? docSnap.data().value : null;
+  } catch (e) {
+    console.error("讀取失敗:", e);
+    return null;
+  }
 }
 
 async function storageSet(key, val) {
-  try { 
-    localStorage.setItem(key, JSON.stringify(val));
-  } catch {}
+  try {
+    await setDoc(doc(db, "pomelo_data", key), { value: val });
+  } catch (e) {
+    console.error("儲存失敗:", e);
+  }
 }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
 
 // (⚠️ 已經將原本的 Claude OCR 函數完全刪除，省下 API 費用與等待時間)
 
