@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
+import jsQR from "jsqr"; // 👈 新增：引入 QR Code 掃描套件
 
 // ── Constants ───────────────────────────────────────────
 const SIZES = [
@@ -27,23 +28,7 @@ async function storageSet(key, val) {
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-// ── Claude OCR ──────────────────────────────────────────
-async function ocr(base64) {
-  try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514", max_tokens: 200,
-        messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
-          { type: "text", text: "這是嘉里大榮貨運單。找出托運編號（條碼下方，如 a1320-351-480-5 或 40371303609）。只回傳編號本身，找不到就回傳「找不到」。" }
-        ]}]
-      })
-    });
-    const d = await r.json();
-    return d.content?.[0]?.text?.trim() || "找不到";
-  } catch { return "找不到"; }
-}
+// (⚠️ 已經將原本的 Claude OCR 函數完全刪除，省下 API 費用與等待時間)
 
 // ── Shared Styles ────────────────────────────────────────
 const S = {
@@ -292,7 +277,7 @@ function OrderForm({ customers, initialData, onSave }) {
   );
 }
 
-// ── Scan Modal ───────────────────────────────────────────
+// ── Scan Modal (改用純前端 QR Code 掃描) ─────────────────────────
 function ScanModal({ order, onSaved, onClose }) {
   const [step, setStep]       = useState("upload");
   const [tracking, setTracking] = useState(order.trackingNumber || "");
@@ -326,11 +311,38 @@ function ScanModal({ order, onSaved, onClose }) {
     img.src = preview;
   }
 
-  async function startOCR() {
+  // 👈 新增的 QR Code 本機掃描功能
+  function startScan() {
     setStep("scanning");
-    const result = await ocr(preview.split(",")[1]);
-    setTracking(result === "找不到" ? "" : result);
-    setStep("confirm");
+    
+    // 使用 setTimeout 讓畫面有時間顯示「掃描中...」
+    setTimeout(() => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        try {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+          
+          if (code && code.data) {
+            setTracking(code.data); // 成功抓到條碼
+          } else {
+            setTracking("");
+            alert("找不到 QR Code！請確保照片清晰且 QR 碼沒有被裁切，或嘗試旋轉照片。");
+          }
+        } catch (e) {
+          setTracking("");
+          alert("掃描發生錯誤，請手動輸入。");
+        }
+        setStep("confirm");
+      };
+      img.src = preview;
+    }, 100);
   }
 
   function confirm() {
@@ -350,7 +362,7 @@ function ScanModal({ order, onSaved, onClose }) {
           <div style={{ fontSize:"2.2rem" }}>📷</div>
           <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", fontSize:"0.88rem", marginTop:"0.4rem" }}>
             點此上傳貨運單照片<br/>
-            <span style={{ fontSize:"0.76rem", color:"#B0905A" }}>AI 自動辨識托運編號</span>
+            <span style={{ fontSize:"0.76rem", color:"#B0905A" }}>掃描右上角 QR Code 讀取單號</span>
           </div>
         </div>
         <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleFile} />
@@ -375,8 +387,9 @@ function ScanModal({ order, onSaved, onClose }) {
               🔄 旋轉 90°
             </button>
           </div>
-          <button onClick={startOCR} style={{ ...S.btnPrimary, marginTop:"0.4rem" }}>
-            ✨ 確認無誤，開始 AI 辨識
+          {/* 按鈕改為 startScan */}
+          <button onClick={startScan} style={{ ...S.btnPrimary, marginTop:"0.4rem" }}>
+            ✨ 確認無誤，掃描 QR Code
           </button>
           <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleFile} />
         </div>
@@ -385,7 +398,7 @@ function ScanModal({ order, onSaved, onClose }) {
       {step === "scanning" && (
         <div style={{ padding:"2.5rem", textAlign:"center" }}>
           <div style={{ fontSize:"2rem" }}>⏳</div>
-          <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", marginTop:"0.6rem" }}>AI 辨識中...</div>
+          <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", marginTop:"0.6rem" }}>QR Code 掃描中...</div>
         </div>
       )}
 
@@ -468,7 +481,7 @@ function OrderCard({ order, onShip, onEdit, onDelete }) {
 
       {order.trackingNumber && (
         <div style={{ marginTop:"0.55rem", display:"flex", alignItems:"center", gap:"0.45rem", flexWrap:"wrap" }}>
-          <span style={{ fontSize:"0.78rem", color:"#5A7A5A", fontFamily:"monospace",
+         <span style={{ fontSize:"0.78rem", color:"#5A7A5A", fontFamily:"monospace",
             background:"#E8F0E8", padding:"0.18rem 0.55rem", borderRadius:"0.4rem" }}>
             📦 {order.trackingNumber}
           </span>
@@ -614,6 +627,7 @@ export default function App() {
             {/* List */}
       <div style={{ padding:"0.65rem 0.8rem 5rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
         {loading && <div style={{ textAlign:"center", padding:"3rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>載入中...</div>}
+        
         {!loading && filtered.length === 0 && (
           <div style={{ textAlign:"center", padding:"3rem", color:"#B0905A",
             fontFamily:"'Noto Serif TC'", fontSize:"0.95rem" }}>
