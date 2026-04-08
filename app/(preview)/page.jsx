@@ -119,9 +119,19 @@ function CustomerManager({ customers, onSave, onClose }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name:"", phone:"", address:"" });
   const [deleteTarget, setDeleteTarget] = useState(null);
-  
-  // 1. 新增搜尋字詞的狀態
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // 1. 新增 useRef 用來定位編輯表單
+  const formRef = useRef(null);
+
+  // 2. 加入 useEffect 監聽編輯狀態，自動平滑捲動
+  useEffect(() => {
+    if (editing !== null && formRef.current) {
+      setTimeout(() => {
+        formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+    }
+  }, [editing]);
 
   function startNew() { setEditing("new"); setForm({ name:"", phone:"", address:"" }); }
   function startEdit(c) { setEditing(c.id); setForm({ name:c.name, phone:c.phone||"", address:c.address||"" }); }
@@ -147,7 +157,6 @@ function CustomerManager({ customers, onSave, onClose }) {
     onClose();
   }
 
-  // 2. 根據搜尋字詞過濾名單
   const filteredList = list.filter(c => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
@@ -161,7 +170,6 @@ function CustomerManager({ customers, onSave, onClose }) {
       {deleteTarget && <ConfirmDialog message="確定刪除這位客戶？" onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
       <div style={{ display:"flex", flexDirection:"column", gap:"0.7rem" }}>
         
-        {/* 3. 加入搜尋框 (當不在編輯狀態且有名單時才顯示) */}
         {!editing && list.length > 0 && (
           <input 
             style={S.input} 
@@ -176,7 +184,6 @@ function CustomerManager({ customers, onSave, onClose }) {
             fontFamily:"'Noto Sans TC'", fontSize:"0.9rem" }}>還沒有客戶資料</div>
         )}
 
-        {/* 4. 修改這裡：從 list 變成 filteredList */}
         {filteredList.map(c => (
           <div key={c.id} style={{ background:"#FFF8EC", border:"1.5px solid #E8D4A0",
             borderRadius:"0.85rem", padding:"0.7rem 0.9rem",
@@ -199,15 +206,15 @@ function CustomerManager({ customers, onSave, onClose }) {
           </div>
         ))}
 
-        {/* 如果有搜尋字詞但沒有結果時顯示提示 */}
         {searchTerm && filteredList.length === 0 && (
            <div style={{ textAlign:"center", padding:"1rem 0", color:"#8A6530", fontSize:"0.85rem" }}>
              找不到符合「{searchTerm}」的客戶
            </div>
         )}
 
+        {/* 3. 在這裡綁定 ref={formRef} */}
         {editing !== null && (
-          <div style={{ background:"#F0EAD8", border:"1.5px solid #D4A050",
+          <div ref={formRef} style={{ background:"#F0EAD8", border:"1.5px solid #D4A050",
             borderRadius:"0.85rem", padding:"0.85rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
             <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#8A6530", fontWeight:700 }}>
               {editing === "new" ? "新增客戶" : "編輯客戶"}
