@@ -119,6 +119,9 @@ function CustomerManager({ customers, onSave, onClose }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name:"", phone:"", address:"" });
   const [deleteTarget, setDeleteTarget] = useState(null);
+  
+  // 1. 新增搜尋字詞的狀態
+  const [searchTerm, setSearchTerm] = useState("");
 
   function startNew() { setEditing("new"); setForm({ name:"", phone:"", address:"" }); }
   function startEdit(c) { setEditing(c.id); setForm({ name:c.name, phone:c.phone||"", address:c.address||"" }); }
@@ -144,28 +147,49 @@ function CustomerManager({ customers, onSave, onClose }) {
     onClose();
   }
 
+  // 2. 根據搜尋字詞過濾名單
+  const filteredList = list.filter(c => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
+    return c.name.toLowerCase().includes(term) || 
+           (c.phone && c.phone.includes(term)) || 
+           (c.address && c.address.includes(term));
+  });
+
   return (
     <>
       {deleteTarget && <ConfirmDialog message="確定刪除這位客戶？" onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
       <div style={{ display:"flex", flexDirection:"column", gap:"0.7rem" }}>
+        
+        {/* 3. 加入搜尋框 (當不在編輯狀態且有名單時才顯示) */}
+        {!editing && list.length > 0 && (
+          <input 
+            style={S.input} 
+            value={searchTerm} 
+            onChange={e => setSearchTerm(e.target.value)} 
+            placeholder="🔍 搜尋姓名、電話或地址..." 
+          />
+        )}
+
         {list.length === 0 && !editing && (
-          <div style={{ textAlign:"center", padding:"1.5rem 0", color:"#74C69D",
+          <div style={{ textAlign:"center", padding:"1.5rem 0", color:"#B0905A",
             fontFamily:"'Noto Sans TC'", fontSize:"0.9rem" }}>還沒有客戶資料</div>
         )}
 
-        {list.map(c => (
-          <div key={c.id} style={{ background:"#F0FFF4", border:"1.5px solid #95D5B2",
+        {/* 4. 修改這裡：從 list 變成 filteredList */}
+        {filteredList.map(c => (
+          <div key={c.id} style={{ background:"#FFF8EC", border:"1.5px solid #E8D4A0",
             borderRadius:"0.85rem", padding:"0.7rem 0.9rem",
             display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
             <div>
-              <div style={{ fontFamily:"'Noto Serif TC'", fontWeight:700, color:"#1B4332" }}>{c.name}</div>
-              {c.phone && <div style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"'Noto Sans TC'" }}>📞 {c.phone}</div>}
-              {c.address && <div style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"'Noto Sans TC'" }}>📍 {c.address}</div>}
+              <div style={{ fontFamily:"'Noto Serif TC'", fontWeight:700, color:"#3A2205" }}>{c.name}</div>
+              {c.phone && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'" }}>📞 {c.phone}</div>}
+              {c.address && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'" }}>📍 {c.address}</div>}
             </div>
             <div style={{ display:"flex", gap:"0.4rem", flexShrink:0 }}>
               <button onClick={() => startEdit(c)}
-                style={{ padding:"0.25rem 0.55rem", borderRadius:"0.4rem", border:"1.5px solid #52B788",
-                  background:"white", color:"#2D6A4F", fontFamily:"'Noto Sans TC'",
+                style={{ padding:"0.25rem 0.55rem", borderRadius:"0.4rem", border:"1.5px solid #D4A050",
+                  background:"white", color:"#A07020", fontFamily:"'Noto Sans TC'",
                   fontWeight:600, fontSize:"0.73rem", cursor:"pointer" }}>編輯</button>
               <button onClick={() => setDeleteTarget(c.id)}
                 style={{ padding:"0.25rem 0.55rem", borderRadius:"0.4rem", border:"1.5px solid #E8B0A0",
@@ -175,10 +199,17 @@ function CustomerManager({ customers, onSave, onClose }) {
           </div>
         ))}
 
+        {/* 如果有搜尋字詞但沒有結果時顯示提示 */}
+        {searchTerm && filteredList.length === 0 && (
+           <div style={{ textAlign:"center", padding:"1rem 0", color:"#8A6530", fontSize:"0.85rem" }}>
+             找不到符合「{searchTerm}」的客戶
+           </div>
+        )}
+
         {editing !== null && (
-          <div style={{ background:"#E8F5E9", border:"1.5px solid #52B788",
+          <div style={{ background:"#F0EAD8", border:"1.5px solid #D4A050",
             borderRadius:"0.85rem", padding:"0.85rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
-            <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#2D6A4F", fontWeight:700 }}>
+            <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#8A6530", fontWeight:700 }}>
               {editing === "new" ? "新增客戶" : "編輯客戶"}
             </div>
             {[["name","姓名 *","王小明"],["phone","電話","0912-345-678"],["address","地址","台北市..."]].map(([k,l,ph]) => (
@@ -191,12 +222,12 @@ function CustomerManager({ customers, onSave, onClose }) {
             <div style={{ display:"flex", gap:"0.5rem" }}>
               <button onClick={() => setEditing(null)}
                 style={{ flex:1, padding:"0.55rem", borderRadius:"0.6rem",
-                  border:"1.5px solid #95D5B2", background:"white",
+                  border:"1.5px solid #D9C9A3", background:"white",
                   fontFamily:"'Noto Sans TC'", fontWeight:600, fontSize:"0.85rem",
-                  cursor:"pointer", color:"#2D6A4F" }}>取消</button>
+                  cursor:"pointer", color:"#8A6530" }}>取消</button>
               <button onClick={saveForm} disabled={!form.name.trim()}
                 style={{ flex:2, padding:"0.55rem", borderRadius:"0.6rem", border:"none",
-                  background: form.name.trim() ? "linear-gradient(135deg,#40916C,#2D6A4F)" : "#CCC",
+                  background: form.name.trim() ? "linear-gradient(135deg,#D4850A,#B8600A)" : "#CCC",
                   fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.85rem",
                   cursor: form.name.trim() ? "pointer" : "not-allowed", color:"white" }}>儲存</button>
             </div>
@@ -204,8 +235,8 @@ function CustomerManager({ customers, onSave, onClose }) {
         )}
 
         <button onClick={startNew}
-          style={{ padding:"0.6rem", borderRadius:"0.65rem", border:"2px dashed #52B788",
-            background:"transparent", color:"#2D6A4F", fontFamily:"'Noto Sans TC'",
+          style={{ padding:"0.6rem", borderRadius:"0.65rem", border:"2px dashed #D4A050",
+            background:"transparent", color:"#A07020", fontFamily:"'Noto Sans TC'",
             fontWeight:600, fontSize:"0.85rem", cursor:"pointer" }}>
           ＋ 新增客戶
         </button>
