@@ -742,7 +742,7 @@ export default function App() {
   陳家文旦
 </div>
             {/* 副標題調深為灰綠色，確保在淺底色上夠清晰 */}
-            <div style={{ fontSize:"0.72rem", color:"#52796F", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
+            <div style={{ fontSize:"0.72rem", color:"#bf2636", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
               共 {stats.total} 筆 · 待寄送 {stats.pending} 筆
             </div>
           </div>
