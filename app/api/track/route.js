@@ -9,6 +9,22 @@ export async function GET(request) {
   }
 
   try {
+    // ==========================================
+    // 🕵️‍♂️ 步驟一：先偷偷發送「同意隱私權條款」，並取得 Cookie 通行證
+    // ==========================================
+    const agreeRes = await fetch('https://www.kerrytj.com/api/Tracking/SetAgreeStatus?status=Y&type=6', {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+      }
+    });
+
+    // 從伺服器的回應中，把 set-cookie 抓出來 (這就是我們的通行證)
+    const cookies = agreeRes.headers.get('set-cookie') || '';
+
+    // ==========================================
+    // 📦 步驟二：帶著通行證，正式查詢包裹
+    // ==========================================
     const payload = {
       trackType: "0",
       trackNo: [
@@ -20,25 +36,25 @@ export async function GET(request) {
       ]
     };
 
-    // 加上更完整的 Header，徹底偽裝成從嘉里大榮官網發出的請求
     const response = await fetch('https://www.kerrytj.com/api/Tracking/GetTracking', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
         'Referer': 'https://www.kerrytj.com/zh/search/search_track.aspx',
-        'Origin': 'https://www.kerrytj.com'
+        'Origin': 'https://www.kerrytj.com',
+        // 🔑 關鍵破解：把剛剛拿到的 Cookie 塞進請求標頭裡！
+        'Cookie': cookies 
       },
       body: JSON.stringify(payload)
     });
 
-    // 先抓取純文字，避免直接 json() 壞掉
     const text = await response.text();
     let data;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      throw new Error(`回傳的不是 JSON，可能是被阻擋了。伺服器回應：${text.substring(0, 100)}`);
+      throw new Error(`回傳的不是 JSON，可能通行證失效或被阻擋。伺服器回應：${text.substring(0, 100)}`);
     }
 
     if (!data.list || data.list.length === 0 || !data.list[0].course) {
@@ -50,7 +66,6 @@ export async function GET(request) {
     const history = courseData.map(item => {
       let timeStrFull = "時間未知";
       try {
-        // 加入防護機制：確保日期和時間真的存在才處理
         if (item.processCargoCrtDate && item.processCargoCrtTime != null) {
           const d = item.processCargoCrtDate.toString();
           const dateStr = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
@@ -79,7 +94,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    // 💡 關鍵修改：把真正的錯誤原因 (error.message) 印在畫面上！
     return NextResponse.json({ 
       error: '查詢失敗，系統異常', 
       details: error.message 
