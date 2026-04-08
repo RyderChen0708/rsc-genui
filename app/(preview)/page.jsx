@@ -121,10 +121,8 @@ function CustomerManager({ customers, onSave, onClose }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   
-  // 1. 新增 useRef 用來定位編輯表單
   const formRef = useRef(null);
 
-  // 2. 加入 useEffect 監聽編輯狀態，自動平滑捲動
   useEffect(() => {
     if (editing !== null && formRef.current) {
       setTimeout(() => {
@@ -136,25 +134,25 @@ function CustomerManager({ customers, onSave, onClose }) {
   function startNew() { setEditing("new"); setForm({ name:"", phone:"", address:"" }); }
   function startEdit(c) { setEditing(c.id); setForm({ name:c.name, phone:c.phone||"", address:c.address||"" }); }
 
-  function saveForm() {
+  // 修改：儲存後立即更新上層狀態與 Firebase
+  async function saveForm() {
     if (!form.name.trim()) return;
     const clean = { name:form.name.trim(), phone:form.phone.trim(), address:form.address.trim() };
     const updated = editing === "new"
       ? [...list, { id:uid(), ...clean }]
       : list.map(c => c.id === editing ? { ...c, ...clean } : c);
+    
     setList(updated);
     setEditing(null);
+    await onSave(updated); // 立即觸發存檔
   }
 
-  function doDelete() {
-    setList(l => l.filter(c => c.id !== deleteTarget));
+  // 修改：刪除後立即更新上層狀態與 Firebase
+  async function doDelete() {
+    const updated = list.filter(c => c.id !== deleteTarget);
+    setList(updated);
     setDeleteTarget(null);
-  }
-
-  async function handleDone() {
-    await storageSet(CUSTOMERS_KEY, list);
-    onSave(list);
-    onClose();
+    await onSave(updated); // 立即觸發存檔
   }
 
   const filteredList = list.filter(c => {
@@ -212,7 +210,6 @@ function CustomerManager({ customers, onSave, onClose }) {
            </div>
         )}
 
-        {/* 3. 在這裡綁定 ref={formRef} */}
         {editing !== null && (
           <div ref={formRef} style={{ background:"#F0EAD8", border:"1.5px solid #D4A050",
             borderRadius:"0.85rem", padding:"0.85rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
@@ -247,7 +244,9 @@ function CustomerManager({ customers, onSave, onClose }) {
             fontWeight:600, fontSize:"0.85rem", cursor:"pointer" }}>
           ＋ 新增客戶
         </button>
-        <button onClick={handleDone} style={S.btnPrimary}>完成並儲存</button>
+        
+        {/* 修改：移除原先的 handleDone 邏輯，改為單純的 onClose 關閉視窗 */}
+        <button onClick={onClose} style={S.btnPrimary}>關閉</button>
       </div>
     </>
   );
