@@ -718,9 +718,9 @@ export default function App() {
   const stats = {
     total: orders.length,
     pending: orders.filter(o => !o.shipped).length,
-    large:  orders.reduce((s,o) => s+o.qty.large,  0),
-    medium: orders.reduce((s,o) => s+o.qty.medium, 0),
-    small:  orders.reduce((s,o) => s+o.qty.small,  0),
+    large:  filtered.reduce((s,o) => s+o.qty.large,  0),
+    medium: filtered.reduce((s,o) => s+o.qty.medium, 0),
+    small:  filtered.reduce((s,o) => s+o.qty.small,  0),
   };
 
   return (
