@@ -569,11 +569,16 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
 
       <div style={{ display:"flex", gap:"0.45rem", marginTop:"0.65rem", flexWrap:"wrap" }}>
         {SIZES.map(s => order.qty[s.key] > 0 && (
-          <span key={s.key} style={{ background:`${s.color}15`, border:`1px solid ${s.color}55`, borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:s.color, fontWeight:600 }}>
-            <img src="/pomelo-icon.png" alt="文旦" style={{ width:"0.9rem", height:"0.9rem", verticalAlign:"middle", marginRight:"0.1rem", position:"relative", top:"-1px" }} /> 
-{s.label} × {order.qty[s.key]} 箱
-          </span>
-        ))}
+  <span key={s.key} style={{ 
+    background:`${s.color}15`, border:`1px solid ${s.color}55`, borderRadius:"0.45rem", 
+    padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", 
+    color:s.color, fontWeight:600, 
+    display:"inline-flex", alignItems:"center", gap:"0.25rem" /* 👈 關鍵的置中魔法 */
+  }}>
+    <img src="/pomelo-icon.png" alt="文旦" style={{ width:"1rem", height:"1rem", objectFit:"contain" }} />
+    <span>{s.label} × {order.qty[s.key]} 箱</span>
+  </span>
+))}
         <span style={{ background:"#D8F3DC", borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#2D6A4F", fontWeight:600 }}>共 {total} 箱</span>
       </div>
 
