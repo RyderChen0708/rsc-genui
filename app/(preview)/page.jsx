@@ -727,13 +727,13 @@ export default function App() {
       `}</style>
 
            {/* Header */}
-      <div style={{ background:"linear-gradient(135deg,#1B4332,#2D6A4F,#1B4332)",
-        padding:"1.1rem 1.1rem 0.9rem", boxShadow:"0 4px 20px rgba(80,30,0,0.25)" }}>
+      <div style={{ background:"linear-gradient(160deg,#52B788 0%,#40916C 50%,#2D6A4F 100%)",
+        padding:"1.1rem 1.1rem 0.9rem", boxShadow:"0 4px 20px rgba(45,106,79,0.3)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1.3rem",
-              fontWeight:800, color:"#D8F3DC", letterSpacing:"0.04em" }}>🍐陳家文旦</div>
-            <div style={{ fontSize:"0.72rem", color:"#95D5B2", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
+              fontWeight:800, color:"#FFFFFF", letterSpacing:"0.04em" }}>🍐陳家文旦</div>
+            <div style={{ fontSize:"0.72rem", color:"#D8F3DC", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
               共 {stats.total} 筆 · 待寄送 {stats.pending} 筆
             </div>
           </div>
