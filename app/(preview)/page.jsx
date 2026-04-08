@@ -274,7 +274,7 @@ function OrderForm({ customers, initialData, onSave }) {
        <div style={{ display:"flex", gap:"0.35rem" }}>
           {SIZES.map(s => (
             <div key={s.key} style={{ flex:1, background:"#F0FFF4", border:`1.5px solid ${s.color}33`, borderRadius:"0.6rem", padding:"0.6rem 0.2rem", textAlign:"center", minWidth:0 }}>
-              <div style={{ lineHeight:1 }}>
+              <div style={{ display:"flex", justifyContent:"center", alignItems:"center", marginBottom:"0.2rem" }}>
   <img src="/pomelo-icon.png" alt="文旦" style={{ width:"1.6rem", height:"1.6rem", objectFit:"contain" }} />
 </div>
               <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
