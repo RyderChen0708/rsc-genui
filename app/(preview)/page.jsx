@@ -271,35 +271,31 @@ function OrderForm({ customers, initialData, onSave }) {
 
 <div>
         <label style={S.label}>箱數（依文旦大小）</label>
-        <div style={{ display:"flex", gap:"0.6rem" }}>
+       <div style={{ display:"flex", gap:"0.35rem" }}>
           {SIZES.map(s => (
-            <div key={s.key} style={{ flex:1, background:"#F0FFF4", border:`1.5px solid ${s.color}33`, borderRadius:"0.75rem", padding:"0.7rem 0.4rem", textAlign:"center" }}>
+            <div key={s.key} style={{ flex:1, background:"#F0FFF4", border:`1.5px solid ${s.color}33`, borderRadius:"0.6rem", padding:"0.6rem 0.2rem", textAlign:"center", minWidth:0 }}>
               <div style={{ fontSize:"1.3rem", lineHeight:1 }}>🍐</div>
               <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.2rem" }}>
-                <button onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>−</button>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.1rem" }}>
+                {/* 加入 type="button" 且微調寬度為 24px，加入 flexShrink:0 防止變形 */}
+                <button type="button" onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))} style={{ width:24, height:24, flexShrink:0, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0, WebkitUserSelect:"none", touchAction:"manipulation" }}>−</button>
                 
-              {/* 👇 更新版：修正手機鍵盤與寬度問題 */}
                 <input 
                   type="text" 
                   inputMode="numeric" 
                   pattern="[0-9]*"
-                  value={qty[s.key]} 
-                  onFocus={e => e.target.select()}
+                  value={qty[s.key] === 0 ? "" : qty[s.key]} 
+                  placeholder="0"
                   onChange={e => {
-                    // 自動過濾掉所有非數字的字元，確保乾淨
                     const pureNumber = e.target.value.replace(/\D/g, '');
                     let val = parseInt(pureNumber, 10);
                     setQty(q => ({ ...q, [s.key]: isNaN(val) ? 0 : val }));
                   }} 
-                  // width 從 2.2rem 加大到 3.5rem，字體稍微調大到 1.1rem
-                  style={{ width:"3.5rem", fontFamily:"monospace", fontSize:"1.1rem", textAlign:"center", color:"#1B4332", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0,WebkitUserSelect: "none",
-                    MozUserSelect: "none",
-                    msUserSelect: "none",
-                    userSelect: "none" }} 
+                  // 寬度從 3.5 縮回 2.2rem，字體調回 1rem，加入 minWidth:0
+                  style={{ width:"2.2rem", minWidth:0, fontFamily:"monospace", fontSize:"1rem", textAlign:"center", color:"#1B4332", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0, WebkitUserSelect:"none", touchAction:"manipulation" }} 
                 />
 
-                <button onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>＋</button>
+                <button type="button" onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))} style={{ width:24, height:24, flexShrink:0, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0, WebkitUserSelect:"none", touchAction:"manipulation" }}>＋</button>
               </div>
             </div>
           ))}
