@@ -468,20 +468,37 @@ function TrackingModal({ trackingNumber }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+ useEffect(() => {
+    let isMounted = true; // 追蹤視窗是否還開著
+    
+    // 每次單號改變時，先重置狀態，確保畫面出現 Loading 轉圈圈
+    setLoading(true);
+    setError(null);
+    setData(null);
+
     async function fetchTrack() {
       try {
         const res = await fetch(`/api/track?no=${trackingNumber}`);
         const result = await res.json();
-        if (res.ok) setData(result);
-        else setError(result.error || "查詢失敗");
+        
+        // 只有在視窗還開著的時候，才把資料寫入畫面
+        if (isMounted) {
+          if (res.ok) setData(result);
+          else setError(result.error || "查詢失敗");
+        }
       } catch (e) {
-        setError("連線異常");
+        if (isMounted) setError("連線異常，請稍後再試");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
+    
     fetchTrack();
+
+    // Cleanup 函數：當視窗被關閉時，把開關切掉
+    return () => {
+      isMounted = false;
+    };
   }, [trackingNumber]);
 
   if (loading) return <div style={{ textAlign:"center", padding:"2rem", color:"#8A6530" }}>⌛ 正在連線 17TRACK 抓取最新貨況...</div>;
@@ -522,7 +539,8 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
   const total = order.qty.large + order.qty.medium + order.qty.small;
   const shippedDate = order.shippedAt ? new Date(order.shippedAt).toLocaleDateString("zh-TW") : null;
   const createdDate = new Date(order.createdAt).toLocaleDateString("zh-TW");
-
+  const deliveredDate = order.deliveredAt ? new Date(order.deliveredAt).toLocaleDateString("zh-TW") : null;
+  
   return (
     <div style={{ background: order.shipped
         ? "linear-gradient(135deg,#F0FAF4,#E8F5ED)"
@@ -572,7 +590,13 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
       )}
 
       <div style={{ marginTop:"0.65rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>建立 {createdDate}{shippedDate && `　寄出 ${shippedDate}`}</span>
+        <span style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>
+  建立 {createdDate}
+  {shippedDate && `　寄出 ${shippedDate}`}
+  {deliveredDate && `　配達 ${deliveredDate}`}
+  {/* 如果已寄出但還沒配達，顯示最新狀態摘要 */}
+  {order.shipped && !order.deliveredAt && order.lastStatus && `　(${order.lastStatus})`}
+</span>
         {!order.shipped && (
           <button onClick={() => onShip(order)} style={{ background:"linear-gradient(135deg,#D4850A,#B8600A)", color:"white", border:"none", borderRadius:"0.55rem", padding:"0.38rem 0.85rem", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.8rem", cursor:"pointer" }}>📷 上傳貨運單</button>
         )}
