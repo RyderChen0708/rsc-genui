@@ -19,9 +19,9 @@ const db = getFirestore(app);
 
 // ── Constants ───────────────────────────────────────────
 const SIZES = [
-  { key: "large",  label: "大顆", color: "#C8820A" },
-  { key: "medium", label: "普通", color: "#D4680A" },
-  { key: "small",  label: "小顆", color: "#B83A20" },
+  { key: "large",  label: "大顆", color: "#1B4332" },
+  { key: "medium", label: "普通", color: "#40916C" },
+  { key: "small",  label: "小顆", color: "#74C69D" },
 ];
 const KERRY_URL = "https://www.kerrytj.com/zh/checkin";
 const ORDERS_KEY    = "pomelo-orders-v2";
@@ -55,16 +55,16 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 const S = {
   input: {
     width: "100%", padding: "0.6rem 0.75rem", borderRadius: "0.6rem",
-    border: "1.5px solid #D9C9A3", background: "#FFFDF7",
+    border: "1.5px solid #95D5B2", background: "#FFFFFF",
     fontFamily: "'Noto Sans TC', sans-serif", fontSize: "0.92rem",
-    color: "#3A2205", outline: "none", boxSizing: "border-box",
+    color: "#1B4332", outline: "none", boxSizing: "border-box",
   },
   label: {
     display: "block", marginBottom: "0.3rem", fontFamily: "'Noto Sans TC'",
-    fontSize: "0.78rem", color: "#8A6530", fontWeight: 600, letterSpacing: "0.04em",
+    fontSize: "0.78rem", color: "#2D6A4F", fontWeight: 600, letterSpacing: "0.04em",
   },
   btnPrimary: {
-    width: "100%", background: "linear-gradient(135deg,#D4850A,#B8600A)",
+    width: "100%", background: "linear-gradient(135deg,#40916C,#2D6A4F)",
     color: "white", border: "none", borderRadius: "0.75rem", padding: "0.82rem",
     fontFamily: "'Noto Sans TC'", fontWeight: 700, fontSize: "0.95rem", cursor: "pointer",
   },
@@ -73,16 +73,16 @@ const S = {
 // ── Modal ────────────────────────────────────────────────
 function Modal({ title, onClose, children }) {
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(15,10,5,0.72)",
+    <div style={{ position:"fixed", inset:0, background:"rgba(10,25,15,0.72)",
       display:"flex", alignItems:"center", justifyContent:"center", zIndex:999, padding:"1rem" }}>
-      <div style={{ background:"#FEFAF3", borderRadius:"1.25rem", width:"100%",
+      <div style={{ background:"#F0FFF4", borderRadius:"1.25rem", width:"100%",
         maxWidth:480, maxHeight:"90vh", overflowY:"auto",
-        boxShadow:"0 24px 64px rgba(0,0,0,0.3)", border:"1.5px solid #E8D9B8" }}>
+        boxShadow:"0 24px 64px rgba(0,0,0,0.3)", border:"1.5px solid #B7E4C7" }}>
         <div style={{ padding:"1.1rem 1.4rem 0.7rem", display:"flex",
-          justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #EDE3CC" }}>
-          <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem", color:"#4A2F0A", fontWeight:700 }}>{title}</span>
+          justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #B7E4C7" }}>
+          <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem", color:"#1B4332", fontWeight:700 }}>{title}</span>
           <button onClick={onClose} style={{ background:"none", border:"none", fontSize:"1.4rem",
-            cursor:"pointer", color:"#A0865A", lineHeight:1, padding:"0 0.2rem" }}>×</button>
+            cursor:"pointer", color:"#52B788", lineHeight:1, padding:"0 0.2rem" }}>×</button>
         </div>
         <div style={{ padding:"1.1rem 1.4rem 1.4rem" }}>{children}</div>
       </div>
@@ -93,16 +93,16 @@ function Modal({ title, onClose, children }) {
 // ── Confirm Dialog ───────────────────────────────────────
 function ConfirmDialog({ message, onConfirm, onCancel }) {
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(15,10,5,0.72)",
+    <div style={{ position:"fixed", inset:0, background:"rgba(10,25,15,0.72)",
       display:"flex", alignItems:"center", justifyContent:"center", zIndex:1200, padding:"1.5rem" }}>
-      <div style={{ background:"#FEFAF3", borderRadius:"1.1rem", padding:"1.5rem 1.75rem",
-        maxWidth:320, width:"100%", boxShadow:"0 16px 48px rgba(0,0,0,0.28)", border:"1.5px solid #E8D9B8" }}>
-        <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.95rem", color:"#3A2205",
+      <div style={{ background:"#F0FFF4", borderRadius:"1.1rem", padding:"1.5rem 1.75rem",
+        maxWidth:320, width:"100%", boxShadow:"0 16px 48px rgba(0,0,0,0.28)", border:"1.5px solid #B7E4C7" }}>
+        <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.95rem", color:"#1B4332",
           marginBottom:"1.25rem", lineHeight:1.6 }}>{message}</div>
         <div style={{ display:"flex", gap:"0.75rem" }}>
           <button onClick={onCancel} style={{ flex:1, padding:"0.65rem", borderRadius:"0.65rem",
-            border:"1.5px solid #D9C9A3", background:"white", fontFamily:"'Noto Sans TC'",
-            fontWeight:600, fontSize:"0.9rem", cursor:"pointer", color:"#8A6530" }}>取消</button>
+            border:"1.5px solid #95D5B2", background:"white", fontFamily:"'Noto Sans TC'",
+            fontWeight:600, fontSize:"0.9rem", cursor:"pointer", color:"#2D6A4F" }}>取消</button>
           <button onClick={onConfirm} style={{ flex:1, padding:"0.65rem", borderRadius:"0.65rem",
             border:"none", background:"linear-gradient(135deg,#C0402A,#A03020)",
             fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.9rem",
@@ -149,23 +149,23 @@ function CustomerManager({ customers, onSave, onClose }) {
       {deleteTarget && <ConfirmDialog message="確定刪除這位客戶？" onConfirm={doDelete} onCancel={() => setDeleteTarget(null)} />}
       <div style={{ display:"flex", flexDirection:"column", gap:"0.7rem" }}>
         {list.length === 0 && !editing && (
-          <div style={{ textAlign:"center", padding:"1.5rem 0", color:"#B0905A",
+          <div style={{ textAlign:"center", padding:"1.5rem 0", color:"#74C69D",
             fontFamily:"'Noto Sans TC'", fontSize:"0.9rem" }}>還沒有客戶資料</div>
         )}
 
         {list.map(c => (
-          <div key={c.id} style={{ background:"#FFF8EC", border:"1.5px solid #E8D4A0",
+          <div key={c.id} style={{ background:"#F0FFF4", border:"1.5px solid #95D5B2",
             borderRadius:"0.85rem", padding:"0.7rem 0.9rem",
             display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
             <div>
-              <div style={{ fontFamily:"'Noto Serif TC'", fontWeight:700, color:"#3A2205" }}>{c.name}</div>
-              {c.phone && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'" }}>📞 {c.phone}</div>}
-              {c.address && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'" }}>📍 {c.address}</div>}
+              <div style={{ fontFamily:"'Noto Serif TC'", fontWeight:700, color:"#1B4332" }}>{c.name}</div>
+              {c.phone && <div style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"'Noto Sans TC'" }}>📞 {c.phone}</div>}
+              {c.address && <div style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"'Noto Sans TC'" }}>📍 {c.address}</div>}
             </div>
             <div style={{ display:"flex", gap:"0.4rem", flexShrink:0 }}>
               <button onClick={() => startEdit(c)}
-                style={{ padding:"0.25rem 0.55rem", borderRadius:"0.4rem", border:"1.5px solid #D4A050",
-                  background:"white", color:"#A07020", fontFamily:"'Noto Sans TC'",
+                style={{ padding:"0.25rem 0.55rem", borderRadius:"0.4rem", border:"1.5px solid #52B788",
+                  background:"white", color:"#2D6A4F", fontFamily:"'Noto Sans TC'",
                   fontWeight:600, fontSize:"0.73rem", cursor:"pointer" }}>編輯</button>
               <button onClick={() => setDeleteTarget(c.id)}
                 style={{ padding:"0.25rem 0.55rem", borderRadius:"0.4rem", border:"1.5px solid #E8B0A0",
@@ -176,9 +176,9 @@ function CustomerManager({ customers, onSave, onClose }) {
         ))}
 
         {editing !== null && (
-          <div style={{ background:"#F0EAD8", border:"1.5px solid #D4A050",
+          <div style={{ background:"#E8F5E9", border:"1.5px solid #52B788",
             borderRadius:"0.85rem", padding:"0.85rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
-            <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#8A6530", fontWeight:700 }}>
+            <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#2D6A4F", fontWeight:700 }}>
               {editing === "new" ? "新增客戶" : "編輯客戶"}
             </div>
             {[["name","姓名 *","王小明"],["phone","電話","0912-345-678"],["address","地址","台北市..."]].map(([k,l,ph]) => (
@@ -191,12 +191,12 @@ function CustomerManager({ customers, onSave, onClose }) {
             <div style={{ display:"flex", gap:"0.5rem" }}>
               <button onClick={() => setEditing(null)}
                 style={{ flex:1, padding:"0.55rem", borderRadius:"0.6rem",
-                  border:"1.5px solid #D9C9A3", background:"white",
+                  border:"1.5px solid #95D5B2", background:"white",
                   fontFamily:"'Noto Sans TC'", fontWeight:600, fontSize:"0.85rem",
-                  cursor:"pointer", color:"#8A6530" }}>取消</button>
+                  cursor:"pointer", color:"#2D6A4F" }}>取消</button>
               <button onClick={saveForm} disabled={!form.name.trim()}
                 style={{ flex:2, padding:"0.55rem", borderRadius:"0.6rem", border:"none",
-                  background: form.name.trim() ? "linear-gradient(135deg,#D4850A,#B8600A)" : "#CCC",
+                  background: form.name.trim() ? "linear-gradient(135deg,#40916C,#2D6A4F)" : "#CCC",
                   fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.85rem",
                   cursor: form.name.trim() ? "pointer" : "not-allowed", color:"white" }}>儲存</button>
             </div>
@@ -204,8 +204,8 @@ function CustomerManager({ customers, onSave, onClose }) {
         )}
 
         <button onClick={startNew}
-          style={{ padding:"0.6rem", borderRadius:"0.65rem", border:"2px dashed #D4A050",
-            background:"transparent", color:"#A07020", fontFamily:"'Noto Sans TC'",
+          style={{ padding:"0.6rem", borderRadius:"0.65rem", border:"2px dashed #52B788",
+            background:"transparent", color:"#2D6A4F", fontFamily:"'Noto Sans TC'",
             fontWeight:600, fontSize:"0.85rem", cursor:"pointer" }}>
           ＋ 新增客戶
         </button>
@@ -248,11 +248,11 @@ function OrderForm({ customers, initialData, onSave }) {
         <label style={S.label}>買家姓名 *</label>
         <input style={S.input} value={name} autoComplete="off" onChange={e => { setName(e.target.value); setShowDrop(true); }} onFocus={() => setShowDrop(true)} placeholder="輸入或選擇客戶" />
         {showDrop && suggestions.length > 0 && (
-          <div style={{ position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:200, background:"white", border:"1.5px solid #D4A050", borderRadius:"0.7rem", boxShadow:"0 8px 24px rgba(0,0,0,0.14)", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:200, background:"white", border:"1.5px solid #52B788", borderRadius:"0.7rem", boxShadow:"0 8px 24px rgba(0,0,0,0.14)", overflow:"hidden" }}>
             {suggestions.map(c => (
-              <div key={c.id} onMouseDown={e => { e.preventDefault(); pick(c); }} style={{ padding:"0.6rem 0.85rem", cursor:"pointer", borderBottom:"1px solid #F0E8D0", fontFamily:"'Noto Sans TC'" }}>
-                <div style={{ fontWeight:700, color:"#3A2205", fontSize:"0.9rem" }}>{c.name}</div>
-                {c.phone && <div style={{ fontSize:"0.74rem", color:"#9A7040" }}>📞 {c.phone}</div>}
+              <div key={c.id} onMouseDown={e => { e.preventDefault(); pick(c); }} style={{ padding:"0.6rem 0.85rem", cursor:"pointer", borderBottom:"1px solid #D8F3DC", fontFamily:"'Noto Sans TC'" }}>
+                <div style={{ fontWeight:700, color:"#1B4332", fontSize:"0.9rem" }}>{c.name}</div>
+                {c.phone && <div style={{ fontSize:"0.74rem", color:"#40916C" }}>📞 {c.phone}</div>}
               </div>
             ))}
           </div>
@@ -273,7 +273,7 @@ function OrderForm({ customers, initialData, onSave }) {
         <label style={S.label}>箱數（依文旦大小）</label>
         <div style={{ display:"flex", gap:"0.6rem" }}>
           {SIZES.map(s => (
-            <div key={s.key} style={{ flex:1, background:"#FFF8EC", border:`1.5px solid ${s.color}33`, borderRadius:"0.75rem", padding:"0.7rem 0.4rem", textAlign:"center" }}>
+            <div key={s.key} style={{ flex:1, background:"#F0FFF4", border:`1.5px solid ${s.color}33`, borderRadius:"0.75rem", padding:"0.7rem 0.4rem", textAlign:"center" }}>
               <div style={{ fontSize:"1.3rem", lineHeight:1 }}>🍐</div>
               <div style={{ fontFamily:"'Noto Sans TC'", fontSize:"0.7rem", color:s.color, fontWeight:700, margin:"0.2rem 0 0.35rem" }}>{s.label}</div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.2rem" }}>
@@ -293,7 +293,7 @@ function OrderForm({ customers, initialData, onSave }) {
                     setQty(q => ({ ...q, [s.key]: isNaN(val) ? 0 : val }));
                   }} 
                   // width 從 2.2rem 加大到 3.5rem，字體稍微調大到 1.1rem
-                  style={{ width:"3.5rem", fontFamily:"monospace", fontSize:"1.1rem", textAlign:"center", color:"#3A2205", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0,WebkitUserSelect: "none",
+                  style={{ width:"3.5rem", fontFamily:"monospace", fontSize:"1.1rem", textAlign:"center", color:"#1B4332", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0,WebkitUserSelect: "none",
                     MozUserSelect: "none",
                     msUserSelect: "none",
                     userSelect: "none" }} 
@@ -311,7 +311,7 @@ function OrderForm({ customers, initialData, onSave }) {
         <input style={S.input} value={note} onChange={e => setNote(e.target.value)} placeholder="付款備註、特殊需求..." />
       </div>
 
-      <button onClick={handleSave} disabled={total === 0 || !name.trim()} style={{ ...S.btnPrimary, background: total > 0 && name.trim() ? "linear-gradient(135deg,#D4850A,#B8600A)" : "#CCC", cursor: total > 0 && name.trim() ? "pointer" : "not-allowed" }}>
+      <button onClick={handleSave} disabled={total === 0 || !name.trim()} style={{ ...S.btnPrimary, background: total > 0 && name.trim() ? "linear-gradient(135deg,#40916C,#2D6A4F)" : "#CCC", cursor: total > 0 && name.trim() ? "pointer" : "not-allowed" }}>
         {initialData ? "儲存修改" : "新增訂單"}
       </button>
     </div>
@@ -392,39 +392,39 @@ function ScanModal({ order, onSaved, onClose }) {
     setStep("done");
   }
 
-  const trackInput = { ...S.input, fontFamily:"monospace", border:"2px solid #D4850A" };
+  const trackInput = { ...S.input, fontFamily:"monospace", border:"2px solid #40916C" };
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"0.9rem", alignItems:"center" }}>
       {step === "upload" && (<>
         <div onClick={() => fileRef.current.click()} style={{ width:"100%",
-          border:"2px dashed #D4A050", borderRadius:"1rem", padding:"1.75rem",
-          textAlign:"center", background:"#FFF8EC", cursor:"pointer" }}>
+          border:"2px dashed #52B788", borderRadius:"1rem", padding:"1.75rem",
+          textAlign:"center", background:"#F0FFF4", cursor:"pointer" }}>
           <div style={{ fontSize:"2.2rem" }}>📷</div>
-          <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", fontSize:"0.88rem", marginTop:"0.4rem" }}>
+          <div style={{ fontFamily:"'Noto Sans TC'", color:"#2D6A4F", fontSize:"0.88rem", marginTop:"0.4rem" }}>
             點此上傳貨運單照片<br/>
-            <span style={{ fontSize:"0.76rem", color:"#B0905A" }}>掃描右上角 QR Code 讀取單號</span>
+            <span style={{ fontSize:"0.76rem", color:"#74C69D" }}>掃描右上角 QR Code 讀取單號</span>
           </div>
         </div>
         <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handleFile} />
-        <div style={{ color:"#A0865A", fontSize:"0.8rem" }}>── 或手動輸入 ──</div>
+        <div style={{ color:"#52B788", fontSize:"0.8rem" }}>── 或手動輸入 ──</div>
         <input style={trackInput} value={tracking} onChange={e => setTracking(e.target.value)} placeholder="托運編號" />
         <button onClick={confirm} disabled={!tracking.trim()} style={{ ...S.btnPrimary,
-          background: tracking.trim() ? "linear-gradient(135deg,#D4850A,#B8600A)" : "#CCC",
+          background: tracking.trim() ? "linear-gradient(135deg,#40916C,#2D6A4F)" : "#CCC",
           cursor: tracking.trim() ? "pointer" : "not-allowed" }}>確認並標記已寄送</button>
       </>)}
 
       {step === "preview" && (
         <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:"0.8rem" }}>
-          <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", fontSize:"0.88rem", fontWeight:600, textAlign:"center" }}>
+          <div style={{ fontFamily:"'Noto Sans TC'", color:"#2D6A4F", fontSize:"0.88rem", fontWeight:600, textAlign:"center" }}>
             確認照片方向與清晰度
           </div>
-          <img src={preview} style={{ width:"100%", maxHeight:250, objectFit:"contain", borderRadius:"0.75rem", border:"1px solid #E8D4A0", background:"#FFFDF7" }} />
+          <img src={preview} style={{ width:"100%", maxHeight:250, objectFit:"contain", borderRadius:"0.75rem", border:"1px solid #95D5B2", background:"#FFFFFF" }} />
           <div style={{ display:"flex", gap:"0.5rem" }}>
-            <button onClick={() => fileRef.current.click()} style={{ flex:1, padding:"0.6rem", borderRadius:"0.55rem", border:"1.5px solid #D4A050", background:"white", color:"#8A6530", fontFamily:"'Noto Sans TC'", fontWeight:600, cursor:"pointer" }}>
+            <button onClick={() => fileRef.current.click()} style={{ flex:1, padding:"0.6rem", borderRadius:"0.55rem", border:"1.5px solid #52B788", background:"white", color:"#2D6A4F", fontFamily:"'Noto Sans TC'", fontWeight:600, cursor:"pointer" }}>
               重新選擇
             </button>
-            <button onClick={rotateImage} style={{ flex:1, padding:"0.6rem", borderRadius:"0.55rem", border:"1.5px solid #D4A050", background:"white", color:"#8A6530", fontFamily:"'Noto Sans TC'", fontWeight:600, cursor:"pointer" }}>
+            <button onClick={rotateImage} style={{ flex:1, padding:"0.6rem", borderRadius:"0.55rem", border:"1.5px solid #52B788", background:"white", color:"#2D6A4F", fontFamily:"'Noto Sans TC'", fontWeight:600, cursor:"pointer" }}>
               🔄 旋轉 90°
             </button>
           </div>
@@ -439,7 +439,7 @@ function ScanModal({ order, onSaved, onClose }) {
       {step === "scanning" && (
         <div style={{ padding:"2.5rem", textAlign:"center" }}>
           <div style={{ fontSize:"2rem" }}>⏳</div>
-          <div style={{ fontFamily:"'Noto Sans TC'", color:"#8A6530", marginTop:"0.6rem" }}>QR Code 掃描中...</div>
+          <div style={{ fontFamily:"'Noto Sans TC'", color:"#2D6A4F", marginTop:"0.6rem" }}>QR Code 掃描中...</div>
         </div>
       )}
 
@@ -457,7 +457,7 @@ function ScanModal({ order, onSaved, onClose }) {
       {step === "done" && (
         <div style={{ textAlign:"center", padding:"1.5rem" }}>
           <div style={{ fontSize:"3rem" }}>✅</div>
-          <div style={{ fontFamily:"'Noto Serif TC'", color:"#2E6B3A", fontWeight:700, marginTop:"0.5rem" }}>已標記為寄送完成</div>
+          <div style={{ fontFamily:"'Noto Serif TC'", color:"#1B4332", fontWeight:700, marginTop:"0.5rem" }}>已標記為寄送完成</div>
           <button onClick={onClose} style={{ ...S.btnPrimary, marginTop:"1rem", width:"auto", padding:"0.6rem 2rem" }}>關閉</button>
         </div>
       )}
@@ -504,33 +504,33 @@ function TrackingModal({ trackingNumber }) {
     };
   }, [trackingNumber]);
 
-  if (loading) return <div style={{ textAlign:"center", padding:"2rem", color:"#8A6530" }}>⌛ 正在連線 17TRACK 抓取最新貨況...</div>;
+  if (loading) return <div style={{ textAlign:"center", padding:"2rem", color:"#2D6A4F" }}>⌛ 正在連線 17TRACK 抓取最新貨況...</div>;
   if (error) return <div style={{ textAlign:"center", padding:"2rem", color:"#B83A20" }}>⚠️ {error}</div>;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
-      <div style={{ background:"#FFF8EC", padding:"0.8rem", borderRadius:"0.75rem", border:"1.5px solid #E8D4A0", textAlign:"center" }}>
-        <div style={{ fontSize:"0.75rem", color:"#8A6530" }}>目前狀態</div>
-        <div style={{ fontSize:"1.2rem", fontWeight:900, color:"#2E6B3A", marginTop:"0.2rem" }}>{data.status}</div>
+      <div style={{ background:"#F0FFF4", padding:"0.8rem", borderRadius:"0.75rem", border:"1.5px solid #95D5B2", textAlign:"center" }}>
+        <div style={{ fontSize:"0.75rem", color:"#2D6A4F" }}>目前狀態</div>
+        <div style={{ fontSize:"1.2rem", fontWeight:900, color:"#1B4332", marginTop:"0.2rem" }}>{data.status}</div>
       </div>
 
       <div style={{ position:"relative", paddingLeft:"1.5rem", marginTop:"0.5rem" }}>
         {/* 時光軸垂直線 */}
-        <div style={{ position:"absolute", left:"5px", top:"5px", bottom:"5px", width:"2px", background:"#E8D9B8" }} />
+        <div style={{ position:"absolute", left:"5px", top:"5px", bottom:"5px", width:"2px", background:"#B7E4C7" }} />
         
         {data.history.map((item, idx) => (
           <div key={idx} style={{ position:"relative", marginBottom:"1.2rem" }}>
             {/* 時光軸圓點 */}
             <div style={{ position:"absolute", left:"-20px", top:"5px", width:"12px", height:"12px", borderRadius:"50%", 
-              background: idx === 0 ? "#D4850A" : "#D9C9A3", border:"2px solid white", boxShadow:"0 0 0 2px #FDF6E3" }} />
-            <div style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"monospace" }}>{item.time}</div>
-            <div style={{ fontSize:"0.9rem", color:"#3A2205", fontWeight: idx === 0 ? 700 : 400, marginTop:"0.2rem" }}>{item.message}</div>
+              background: idx === 0 ? "#D4850A" : "#95D5B2", border:"2px solid white", boxShadow:"0 0 0 2px #F0FFF4" }} />
+            <div style={{ fontSize:"0.72rem", color:"#74C69D", fontFamily:"monospace" }}>{item.time}</div>
+            <div style={{ fontSize:"0.9rem", color:"#1B4332", fontWeight: idx === 0 ? 700 : 400, marginTop:"0.2rem" }}>{item.message}</div>
           </div>
         ))}
       </div>
 
       <a href={`https://www.kerrytj.com/zh/checkin?no=${trackingNumber}`} target="_blank" rel="noopener noreferrer"
-        style={{ textAlign:"center", fontSize:"0.75rem", color:"#A0865A", textDecoration:"underline", marginTop:"0.5rem" }}>
+        style={{ textAlign:"center", fontSize:"0.75rem", color:"#52B788", textDecoration:"underline", marginTop:"0.5rem" }}>
         前往嘉里大榮官網查看原始資料
       </a>
     </div>
@@ -546,26 +546,26 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
   
   return (
     <div style={{ background: order.shipped
-        ? "linear-gradient(135deg,#F0FAF4,#E8F5ED)"
-        : "linear-gradient(135deg,#FFFEF9,#FFF8EC)",
-      border:`1.5px solid ${order.shipped ? "#A8D4B4" : "#E8D4A0"}`,
+        ? "linear-gradient(135deg,#F0FFF4,#E8F5E9)"
+        : "linear-gradient(135deg,#FFFFFF,#F0FFF4)",
+      border:`1.5px solid ${order.shipped ? "#74C69D" : "#95D5B2"}`,
       borderRadius:"1.1rem", padding:"1rem 1.1rem",
       boxShadow:"0 2px 10px rgba(0,0,0,0.06)" }}>
 
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ display:"flex", alignItems:"center", gap:"0.45rem", flexWrap:"wrap" }}>
-            <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem", fontWeight:700, color:"#3A2205" }}>{order.name}</span>
-            <span style={{ fontSize:"0.68rem", fontWeight:700, padding:"0.12rem 0.45rem", borderRadius:"99px", fontFamily:"'Noto Sans TC'", background: order.shipped ? "#2E8B57" : "#D4850A", color:"white" }}>
+            <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem", fontWeight:700, color:"#1B4332" }}>{order.name}</span>
+            <span style={{ fontSize:"0.68rem", fontWeight:700, padding:"0.12rem 0.45rem", borderRadius:"99px", fontFamily:"'Noto Sans TC'", background: order.shipped ? "#2D6A4F" : "#52B788", color:"white" }}>
               {order.shipped ? "已寄送" : "待寄送"}
             </span>
           </div>
-          {order.phone && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>📞 {order.phone}</div>}
-          {order.address && <div style={{ fontSize:"0.78rem", color:"#8A6530", fontFamily:"'Noto Sans TC'" }}>📍 {order.address}</div>}
+          {order.phone && <div style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>📞 {order.phone}</div>}
+          {order.address && <div style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"'Noto Sans TC'" }}>📍 {order.address}</div>}
         </div>
         <div style={{ display:"flex", gap:"0.4rem", flexShrink:0, marginLeft:"0.5rem" }}>
-          <button onClick={() => onEdit(order)} style={{ padding:"0.28rem 0.65rem", borderRadius:"0.45rem", border:"1.5px solid #D4A050", background:"white", color:"#A07020", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>編輯</button>
-          <button onClick={() => onDelete(order.id)} style={{ padding:"0.28rem 0.65rem", borderRadius:"0.45rem", border:"1.5px solid #E8B0A0", background:"#FFF0EC", color:"#C0402A", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>刪除</button>
+          <button onClick={() => onEdit(order)} style={{ padding:"0.28rem 0.65rem", borderRadius:"0.45rem", border:"1.5px solid #52B788", background:"white", color:"#2D6A4F", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>編輯</button>
+          <button onClick={() => onDelete(order.id)} style={{ padding:"0.28rem 0.65rem", borderRadius:"0.45rem", border:"1.5px solid #E8B0A0", background:"#FEF2F2", color:"#C0402A", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.75rem", cursor:"pointer" }}>刪除</button>
         </div>
       </div>
 
@@ -575,25 +575,25 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
             🍐 {s.label} × {order.qty[s.key]} 箱
           </span>
         ))}
-        <span style={{ background:"#F0E8D0", borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#7A5520", fontWeight:600 }}>共 {total} 箱</span>
+        <span style={{ background:"#D8F3DC", borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#2D6A4F", fontWeight:600 }}>共 {total} 箱</span>
       </div>
 
-      {order.note && <div style={{ marginTop:"0.45rem", fontSize:"0.78rem", color:"#9A7040", fontFamily:"'Noto Sans TC'", fontStyle:"italic" }}>💬 {order.note}</div>}
+      {order.note && <div style={{ marginTop:"0.45rem", fontSize:"0.78rem", color:"#40916C", fontFamily:"'Noto Sans TC'", fontStyle:"italic" }}>💬 {order.note}</div>}
 
       {order.trackingNumber && (
         <div style={{ marginTop:"0.55rem", display:"flex", alignItems:"center", gap:"0.45rem", flexWrap:"wrap" }}>
-         <span onClick={() => onTrack(order.trackingNumber)} style={{ fontSize:"0.78rem", color:"#5A7A5A", fontFamily:"monospace", background:"#E8F0E8", padding:"0.18rem 0.55rem", borderRadius:"0.4rem", cursor:"pointer" }}>
+         <span onClick={() => onTrack(order.trackingNumber)} style={{ fontSize:"0.78rem", color:"#2D6A4F", fontFamily:"monospace", background:"#D8F3DC", padding:"0.18rem 0.55rem", borderRadius:"0.4rem", cursor:"pointer" }}>
             📦 {order.trackingNumber}
           </span>
           <button onClick={() => onTrack(order.trackingNumber)}
-            style={{ fontSize:"0.76rem", color:"#D4850A", fontFamily:"'Noto Sans TC'", fontWeight:600, border:"1px solid #E8C070", background:"#FFF0D0", padding:"0.18rem 0.55rem", borderRadius:"0.4rem", cursor:"pointer" }}>
+            style={{ fontSize:"0.76rem", color:"#D4850A", fontFamily:"'Noto Sans TC'", fontWeight:600, border:"1px solid #74C69D", background:"#E8F5E9", padding:"0.18rem 0.55rem", borderRadius:"0.4rem", cursor:"pointer" }}>
              🔍 查詢進度
           </button>
         </div>
       )}
 
       <div style={{ marginTop:"0.65rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>
+        <span style={{ fontSize:"0.72rem", color:"#74C69D", fontFamily:"'Noto Sans TC'" }}>
   建立 {createdDate}
   {shippedDate && `　寄出 ${shippedDate}`}
   {deliveredDate && `　配達 ${deliveredDate}`}
@@ -601,7 +601,7 @@ function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
   {order.shipped && !order.deliveredAt && order.lastStatus && `　(${order.lastStatus})`}
 </span>
         {!order.shipped && (
-          <button onClick={() => onShip(order)} style={{ background:"linear-gradient(135deg,#D4850A,#B8600A)", color:"white", border:"none", borderRadius:"0.55rem", padding:"0.38rem 0.85rem", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.8rem", cursor:"pointer" }}>📷 上傳貨運單</button>
+          <button onClick={() => onShip(order)} style={{ background:"linear-gradient(135deg,#40916C,#2D6A4F)", color:"white", border:"none", borderRadius:"0.55rem", padding:"0.38rem 0.85rem", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.8rem", cursor:"pointer" }}>📷 上傳貨運單</button>
         )}
       </div>
     </div>
@@ -720,46 +720,46 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#FDF6E3 0%,#F7EDD0 40%,#EFE0B8 100%)" }}>
+    <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#F0FFF4 0%,#E8F5E9 40%,#C8E6C9 100%)" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
         * { box-sizing:border-box; } body { margin:0; }
       `}</style>
 
            {/* Header */}
-      <div style={{ background:"linear-gradient(135deg,#8B4513,#A0522D,#6B3410)",
+      <div style={{ background:"linear-gradient(135deg,#1B4332,#2D6A4F,#1B4332)",
         padding:"1.1rem 1.1rem 0.9rem", boxShadow:"0 4px 20px rgba(80,30,0,0.25)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1.3rem",
-              fontWeight:800, color:"#FFE88A", letterSpacing:"0.04em" }}>🍐陳家文旦</div>
-            <div style={{ fontSize:"0.72rem", color:"#D4B87A", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
+              fontWeight:800, color:"#D8F3DC", letterSpacing:"0.04em" }}>🍐陳家文旦</div>
+            <div style={{ fontSize:"0.72rem", color:"#95D5B2", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
               共 {stats.total} 筆 · 待寄送 {stats.pending} 筆
             </div>
           </div>
           <div style={{ display:"flex", gap:"0.45rem" }}>
             <button onClick={() => setModal("customers")}
-              style={{ background:"rgba(255,255,255,0.15)", color:"#FFE8A0",
-                border:"1.5px solid rgba(255,220,100,0.4)", borderRadius:"0.6rem",
+              style={{ background:"rgba(255,255,255,0.15)", color:"#B7E4C7",
+                border:"1.5px solid rgba(180,240,200,0.4)", borderRadius:"0.6rem",
                 padding:"0.48rem 0.7rem", fontFamily:"'Noto Sans TC'",
                 fontWeight:600, fontSize:"0.78rem", cursor:"pointer" }}>👥 客戶</button>
             <button onClick={() => setModal("add")}
-              style={{ background:"linear-gradient(135deg,#FFD050,#F0A800)", color:"#4A2800",
+              style={{ background:"linear-gradient(135deg,#74C69D,#52B788)", color:"#1B4332",
                 border:"none", borderRadius:"0.6rem", padding:"0.48rem 0.8rem",
                 fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.82rem",
-                cursor:"pointer", boxShadow:"0 3px 10px rgba(200,130,0,0.4)" }}>＋ 新增</button>
+                cursor:"pointer", boxShadow:"0 3px 10px rgba(52,183,120,0.4)" }}>＋ 新增</button>
           </div>
         </div>
       </div>
 
       {/* Stats */}
       <div style={{ padding:"0.8rem 0.8rem 0", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"0.5rem" }}>
-        {[["大顆",stats.large,"#C8820A"],["普通",stats.medium,"#D4680A"],["小顆",stats.small,"#B83A20"]].map(([l,v,c]) => (
+        {[["大顆",stats.large,"#1B4332"],["普通",stats.medium,"#40916C"],["小顆",stats.small,"#74C69D"]].map(([l,v,c]) => (
           <div key={l} style={{ background:"white", borderRadius:"0.75rem", padding:"0.6rem 0.4rem",
             textAlign:"center", border:`1.5px solid ${c}25`, boxShadow:"0 2px 8px rgba(0,0,0,0.05)" }}>
             <div style={{ fontSize:"0.68rem", color:c, fontWeight:700, fontFamily:"'Noto Sans TC'" }}>🍐 {l}</div>
-            <div style={{ fontSize:"1.4rem", fontWeight:900, color:"#3A2205", fontFamily:"'Noto Serif TC'" }}>{v}</div>
-            <div style={{ fontSize:"0.66rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>箱</div>
+            <div style={{ fontSize:"1.4rem", fontWeight:900, color:"#1B4332", fontFamily:"'Noto Serif TC'" }}>{v}</div>
+            <div style={{ fontSize:"0.66rem", color:"#74C69D", fontFamily:"'Noto Sans TC'" }}>箱</div>
           </div>
         ))}
       </div>
@@ -772,9 +772,9 @@ export default function App() {
         <div style={{ display:"flex", gap:"0.4rem" }}>
           {[["all","全部"],["pending","待寄送"],["shipped","已寄送"]].map(([v,l]) => (
             <button key={v} onClick={() => setFilter(v)} style={{ flex:1, padding:"0.44rem",
-              borderRadius:"0.55rem", border:`1.5px solid ${filter===v ? "#D4850A" : "#D9C9A3"}`,
-              background: filter===v ? "linear-gradient(135deg,#D4850A,#B8600A)" : "white",
-              color: filter===v ? "white" : "#8A6530",
+              borderRadius:"0.55rem", border:`1.5px solid ${filter===v ? "#D4850A" : "#95D5B2"}`,
+              background: filter===v ? "linear-gradient(135deg,#40916C,#2D6A4F)" : "white",
+              color: filter===v ? "white" : "#2D6A4F",
               fontFamily:"'Noto Sans TC'", fontWeight:600, fontSize:"0.78rem", cursor:"pointer" }}>{l}</button>
           ))}
         </div>
@@ -782,10 +782,10 @@ export default function App() {
 
             {/* List */}
       <div style={{ padding:"0.65rem 0.8rem 5rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
-        {loading && <div style={{ textAlign:"center", padding:"3rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>載入中...</div>}
+        {loading && <div style={{ textAlign:"center", padding:"3rem", color:"#74C69D", fontFamily:"'Noto Sans TC'" }}>載入中...</div>}
         
         {!loading && filtered.length === 0 && (
-          <div style={{ textAlign:"center", padding:"3rem", color:"#B0905A",
+          <div style={{ textAlign:"center", padding:"3rem", color:"#74C69D",
             fontFamily:"'Noto Serif TC'", fontSize:"0.95rem" }}>
             {orders.length === 0 ? "還沒有訂單，點右上角新增！" : "沒有符合的訂單"}
           </div>
