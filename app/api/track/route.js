@@ -8,83 +8,64 @@ export async function GET(request) {
     return NextResponse.json({ error: '請提供托運單號' }, { status: 400 });
   }
 
+  // 🔑 請將下方的字串，換成你剛剛在 17TRACK 控制台複製的 API Key (17token)！
+  const API_KEY = "FAB196B8BDACFA6B5B536BDCD9BE0C78";
+
   try {
     // ==========================================
-    // 🕵️‍♂️ 步驟一：先偷偷發送「同意隱私權條款」，並取得 Cookie 通行證
+    // 步驟一：向 17TRACK 註冊單號 (告訴它我們要追蹤這個包裹)
     // ==========================================
-    const agreeRes = await fetch('https://www.kerrytj.com/api/Tracking/SetAgreeStatus?status=Y&type=6', {
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
-      }
-    });
-
-    // 從伺服器的回應中，把 set-cookie 抓出來 (這就是我們的通行證)
-    const cookies = agreeRes.headers.get('set-cookie') || '';
-
-    // ==========================================
-    // 📦 步驟二：帶著通行證，正式查詢包裹
-    // ==========================================
-    const payload = {
-      trackType: "0",
-      trackNo: [
-        { idxTxt: "一", value: no },
-        { idxTxt: "二", value: "" },
-        { idxTxt: "三", value: "" },
-        { idxTxt: "四", value: "" },
-        { idxTxt: "五", value: "" }
-      ]
-    };
-
-    const response = await fetch('https://www.kerrytj.com/api/Tracking/GetTracking', {
+    await fetch('https://api.17track.net/track/v2.2/register', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-        'Referer': 'https://www.kerrytj.com/zh/search/search_track.aspx',
-        'Origin': 'https://www.kerrytj.com',
-        // 🔑 關鍵破解：把剛剛拿到的 Cookie 塞進請求標頭裡！
-        'Cookie': cookies 
+        '17token': API_KEY,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      // 17TRACK 通常會自動辨識物流商，所以我們只傳單號即可
+      body: JSON.stringify([{ number: no }])
     });
 
-    const text = await response.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      throw new Error(`回傳的不是 JSON，可能通行證失效或被阻擋。伺服器回應：${text.substring(0, 100)}`);
+    // ==========================================
+    // 步驟二：取得追蹤資訊
+    // ==========================================
+    const response = await fetch('https://api.17track.net/track/v2.2/gettrackinfo', {
+      method: 'POST',
+      headers: {
+        '17token': API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([{ number: no }])
+    });
+
+    const data = await response.json();
+
+    // 防呆：檢查 17TRACK 是否有成功回傳這個單號的資料
+    if (!data || !data.data || !data.data.accepted || data.data.accepted.length === 0) {
+       return NextResponse.json({ error: '17TRACK 尚未抓取到資料，請稍後再試。', raw: data }, { status: 404 });
     }
 
-    if (!data.list || data.list.length === 0 || !data.list[0].course) {
-      return NextResponse.json({ error: '查無此單號或尚未建檔', rawData: data }, { status: 404 });
-    }
-
-    const courseData = data.list[0].course;
+    const trackInfo = data.data.accepted[0].track;
     
-    const history = courseData.map(item => {
-      let timeStrFull = "時間未知";
-      try {
-        if (item.processCargoCrtDate && item.processCargoCrtTime != null) {
-          const d = item.processCargoCrtDate.toString();
-          const dateStr = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
-          
-          const t = item.processCargoCrtTime.toString().padStart(6, '0');
-          const timeStr = `${t.slice(0,2)}:${t.slice(2,4)}`;
-          timeStrFull = `${dateStr} ${timeStr}`;
-        }
-      } catch(e) {
-        console.error("時間解析錯誤");
-      }
+    // 如果 17TRACK 剛收到這個單號，可能還在爬蟲中，狀態會是 null
+    if (!trackInfo || (!trackInfo.z1 && !trackInfo.z2 && !trackInfo.z0)) {
+       return NextResponse.json({ 
+         trackingNumber: no,
+         status: "17TRACK 處理中 (首次查詢需等候幾分鐘)", 
+         history: [] 
+       });
+    }
 
-      return {
-        time: timeStrFull,
-        message: `${item.statusIdName || '未知狀態'} (${item.processDepotIdName || '未知站所'})`
-      };
-    });
+    // 17TRACK 的軌跡通常放在 z1 (最新狀態) 或 z0 陣列裡
+    const rawHistory = trackInfo.z1 || trackInfo.z0 || trackInfo.z2 || [];
+    
+    const history = rawHistory.map(item => ({
+      // 17TRACK 回傳的 item.z 是時間 (例如 "2026-03-20 16:03")
+      time: item.z || "時間未知", 
+      // 17TRACK 回傳的 item.d 是物流狀態與站所說明
+      message: item.d || "狀態更新" 
+    }));
 
-    history.sort((a, b) => new Date(b.time) - new Date(a.time));
+    // 取得最新的一筆狀態作為摘要
     const currentStatus = history.length > 0 ? history[0].message : "處理中";
 
     return NextResponse.json({
@@ -95,7 +76,7 @@ export async function GET(request) {
 
   } catch (error) {
     return NextResponse.json({ 
-      error: '查詢失敗，系統異常', 
+      error: '查詢失敗，17TRACK 系統連線異常', 
       details: error.message 
     }, { status: 500 });
   }
