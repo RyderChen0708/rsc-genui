@@ -279,17 +279,21 @@ function OrderForm({ customers, initialData, onSave }) {
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"0.2rem" }}>
                 <button onClick={() => setQty(q => ({...q,[s.key]:Math.max(0,q[s.key]-1)}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>−</button>
                 
-                {/* 👇 這裡把原本的 span 換成了 input，並加上了全選與手動輸入功能 */}
+              {/* 👇 更新版：修正手機鍵盤與寬度問題 */}
                 <input 
-                  type="number" 
-                  min="0" 
+                  type="text" 
+                  inputMode="numeric" 
+                  pattern="[0-9]*"
                   value={qty[s.key]} 
                   onFocus={e => e.target.select()}
                   onChange={e => {
-                    let val = parseInt(e.target.value, 10);
-                    setQty(q => ({ ...q, [s.key]: isNaN(val) || val < 0 ? 0 : val }));
+                    // 自動過濾掉所有非數字的字元，確保乾淨
+                    const pureNumber = e.target.value.replace(/\D/g, '');
+                    let val = parseInt(pureNumber, 10);
+                    setQty(q => ({ ...q, [s.key]: isNaN(val) ? 0 : val }));
                   }} 
-                  style={{ width:"2.2rem", fontFamily:"monospace", fontSize:"1rem", textAlign:"center", color:"#3A2205", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0 }} 
+                  // width 從 2.2rem 加大到 3.5rem，字體稍微調大到 1.1rem
+                  style={{ width:"3.5rem", fontFamily:"monospace", fontSize:"1.1rem", textAlign:"center", color:"#3A2205", fontWeight:700, border:"none", background:"transparent", outline:"none", padding:0 }} 
                 />
 
                 <button onClick={() => setQty(q => ({...q,[s.key]:q[s.key]+1}))} style={{ width:22, height:22, borderRadius:"50%", border:`1.5px solid ${s.color}`, background:"white", cursor:"pointer", color:s.color, fontWeight:700, fontSize:"0.9rem", lineHeight:1, padding:0 }}>＋</button>
