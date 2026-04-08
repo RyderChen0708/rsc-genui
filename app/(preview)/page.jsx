@@ -723,27 +723,33 @@ export default function App() {
       `}</style>
 
            {/* Header */}
-      <div style={{ background:"linear-gradient(160deg,#52B788 0%,#40916C 50%,#2D6A4F 100%)",
-        padding:"1.1rem 1.1rem 0.9rem", boxShadow:"0 4px 20px rgba(45,106,79,0.3)" }}>
+      {/* Header */}
+      <div style={{ background:"#F0FFF4", /* 👈 1. 背景改為淺綠色 */
+        padding:"1.1rem 1.1rem 0.9rem", boxShadow:"0 4px 15px rgba(45,106,79,0.12)" }}> {/* 微調了陰影顏色讓它融入綠色系 */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1.3rem",
-              fontWeight:800, color:"#FFFFFF", letterSpacing:"0.04em" }}>🍐陳家文旦</div>
-            <div style={{ fontSize:"0.72rem", color:"#D8F3DC", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
+              fontWeight:800, color:"#2D6A4F", letterSpacing:"0.04em" }}> {/* 👈 2. 標題改為深綠色 */}
+              🍐陳家文旦
+            </div>
+            {/* 副標題調深為灰綠色，確保在淺底色上夠清晰 */}
+            <div style={{ fontSize:"0.72rem", color:"#52796F", fontFamily:"'Noto Sans TC'", marginTop:"0.1rem" }}>
               共 {stats.total} 筆 · 待寄送 {stats.pending} 筆
             </div>
           </div>
           <div style={{ display:"flex", gap:"0.45rem" }}>
+            {/* 客戶按鈕：改為白底綠框綠字 */}
             <button onClick={() => setModal("customers")}
-              style={{ background:"rgba(255,255,255,0.15)", color:"#B7E4C7",
-                border:"1.5px solid rgba(180,240,200,0.4)", borderRadius:"0.6rem",
+              style={{ background:"white", color:"#2D6A4F",
+                border:"1.5px solid #95D5B2", borderRadius:"0.6rem",
                 padding:"0.48rem 0.7rem", fontFamily:"'Noto Sans TC'",
                 fontWeight:600, fontSize:"0.78rem", cursor:"pointer" }}>👥 客戶</button>
+            {/* 新增按鈕：改為質感的森林綠色漸層 */}
             <button onClick={() => setModal("add")}
-              style={{ background:"linear-gradient(135deg,#74C69D,#52B788)", color:"#1B4332",
+              style={{ background:"linear-gradient(135deg,#40916C,#2D6A4F)", color:"white",
                 border:"none", borderRadius:"0.6rem", padding:"0.48rem 0.8rem",
                 fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.82rem",
-                cursor:"pointer", boxShadow:"0 3px 10px rgba(52,183,120,0.4)" }}>＋ 新增</button>
+                cursor:"pointer", boxShadow:"0 3px 10px rgba(45,106,79,0.3)" }}>＋ 新增</button>
           </div>
         </div>
       </div>
