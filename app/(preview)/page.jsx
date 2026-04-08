@@ -620,6 +620,64 @@ export default function App() {
     });
   }, []);
 
+  useEffect(() => {
+  // 當 orders 載入完成後，執行自動追蹤
+  if (!loading && orders.length > 0) {
+    autoUpdateTracking();
+  }
+}, [loading]); // 只在初始載入完成時執行一次
+
+  async function autoUpdateTracking() {
+  // 篩選出：已寄出、有單號、且「還沒確認配達」的訂單
+  const pendingOrders = orders.filter(o => o.shipped && o.trackingNumber && !o.deliveredAt);
+  
+  if (pendingOrders.length === 0) return;
+
+  let hasChanges = false;
+  const newOrders = [...orders];
+
+  // 逐一檢查狀態 (為了不要瞬間塞爆 API，我們用循環處理)
+  for (const order of pendingOrders) {
+    try {
+      const res = await fetch(`/api/track?no=${order.trackingNumber}`);
+      const data = await res.json();
+      
+     if (data.status) {
+        const idx = newOrders.findIndex(o => o.id === order.id);
+        if (idx !== -1) {
+          // 1. 先拷貝原本的訂單資料，再更新最新狀態摘要
+          newOrders[idx] = { 
+            ...newOrders[idx], 
+            lastStatus: data.status 
+          };
+          
+          // 2. 如果 17TRACK 說「配送完成」或「Delivered」，我們就補上配達日期
+          if (data.status.includes("完成") || data.status.includes("Delivered")) {
+            // 嘗試從歷史紀錄抓取最後一筆的時間，抓不到就用今天
+            const finishTime = data.history?.[0]?.time ? new Date(data.history[0].time).toISOString() : new Date().toISOString();
+            
+            // 同樣用拷貝的方式，把配達日期加進去
+            newOrders[idx] = { 
+              ...newOrders[idx], 
+              deliveredAt: finishTime 
+            };
+          }
+          hasChanges = true;
+        }
+      }
+    } catch (e) {
+      console.error(`自動追蹤單號 ${order.trackingNumber} 失敗`);
+    }
+  }
+
+  // 如果有資料更新，一次性寫回 Firebase
+  if (hasChanges) {
+    setOrders(newOrders);
+    await storageSet(ORDERS_KEY, newOrders);
+  }
+}
+  
+
   async function handleAddOrder(order) {
     const updated = [order, ...orders];
     setOrders(updated); await storageSet(ORDERS_KEY, updated); setModal(null);
