@@ -462,9 +462,63 @@ function ScanModal({ order, onSaved, onClose }) {
   );
 }
 
+// ── Tracking Modal (顯示 17TRACK 的歷史紀錄) ──────────────────────
+function TrackingModal({ trackingNumber }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchTrack() {
+      try {
+        const res = await fetch(`/api/track?no=${trackingNumber}`);
+        const result = await res.json();
+        if (res.ok) setData(result);
+        else setError(result.error || "查詢失敗");
+      } catch (e) {
+        setError("連線異常");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTrack();
+  }, [trackingNumber]);
+
+  if (loading) return <div style={{ textAlign:"center", padding:"2rem", color:"#8A6530" }}>⌛ 正在連線 17TRACK 抓取最新貨況...</div>;
+  if (error) return <div style={{ textAlign:"center", padding:"2rem", color:"#B83A20" }}>⚠️ {error}</div>;
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
+      <div style={{ background:"#FFF8EC", padding:"0.8rem", borderRadius:"0.75rem", border:"1.5px solid #E8D4A0", textAlign:"center" }}>
+        <div style={{ fontSize:"0.75rem", color:"#8A6530" }}>目前狀態</div>
+        <div style={{ fontSize:"1.2rem", fontWeight:900, color:"#2E6B3A", marginTop:"0.2rem" }}>{data.status}</div>
+      </div>
+
+      <div style={{ position:"relative", paddingLeft:"1.5rem", marginTop:"0.5rem" }}>
+        {/* 時光軸垂直線 */}
+        <div style={{ position:"absolute", left:"5px", top:"5px", bottom:"5px", width:"2px", background:"#E8D9B8" }} />
+        
+        {data.history.map((item, idx) => (
+          <div key={idx} style={{ position:"relative", marginBottom:"1.2rem" }}>
+            {/* 時光軸圓點 */}
+            <div style={{ position:"absolute", left:"-20px", top:"5px", width:"12px", height:"12px", borderRadius:"50%", 
+              background: idx === 0 ? "#D4850A" : "#D9C9A3", border:"2px solid white", boxShadow:"0 0 0 2px #FDF6E3" }} />
+            <div style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"monospace" }}>{item.time}</div>
+            <div style={{ fontSize:"0.9rem", color:"#3A2205", fontWeight: idx === 0 ? 700 : 400, marginTop:"0.2rem" }}>{item.message}</div>
+          </div>
+        ))}
+      </div>
+
+      <a href={`https://www.kerrytj.com/zh/checkin?no=${trackingNumber}`} target="_blank" rel="noopener noreferrer"
+        style={{ textAlign:"center", fontSize:"0.75rem", color:"#A0865A", textDecoration:"underline", marginTop:"0.5rem" }}>
+        前往嘉里大榮官網查看原始資料
+      </a>
+    </div>
+  );
+}
 
 // ── Order Card ───────────────────────────────────────────
-function OrderCard({ order, onShip, onEdit, onDelete }) {
+function OrderCard({ order, onShip, onEdit, onDelete, onTrack }) {
   const total = order.qty.large + order.qty.medium + order.qty.small;
   const shippedDate = order.shippedAt ? new Date(order.shippedAt).toLocaleDateString("zh-TW") : null;
   const createdDate = new Date(order.createdAt).toLocaleDateString("zh-TW");
@@ -480,11 +534,8 @@ function OrderCard({ order, onShip, onEdit, onDelete }) {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ display:"flex", alignItems:"center", gap:"0.45rem", flexWrap:"wrap" }}>
-            <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem",
-              fontWeight:700, color:"#3A2205" }}>{order.name}</span>
-            <span style={{ fontSize:"0.68rem", fontWeight:700, padding:"0.12rem 0.45rem",
-              borderRadius:"99px", fontFamily:"'Noto Sans TC'",
-              background: order.shipped ? "#2E8B57" : "#D4850A", color:"white" }}>
+            <span style={{ fontFamily:"'Noto Serif TC',serif", fontSize:"1rem", fontWeight:700, color:"#3A2205" }}>{order.name}</span>
+            <span style={{ fontSize:"0.68rem", fontWeight:700, padding:"0.12rem 0.45rem", borderRadius:"99px", fontFamily:"'Noto Sans TC'", background: order.shipped ? "#2E8B57" : "#D4850A", color:"white" }}>
               {order.shipped ? "已寄送" : "待寄送"}
             </span>
           </div>
@@ -497,51 +548,33 @@ function OrderCard({ order, onShip, onEdit, onDelete }) {
         </div>
       </div>
 
-      
       <div style={{ display:"flex", gap:"0.45rem", marginTop:"0.65rem", flexWrap:"wrap" }}>
         {SIZES.map(s => order.qty[s.key] > 0 && (
-          <span key={s.key} style={{ background:`${s.color}15`, border:`1px solid ${s.color}55`,
-            borderRadius:"0.45rem", padding:"0.18rem 0.55rem",
-            fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:s.color, fontWeight:600 }}>
+          <span key={s.key} style={{ background:`${s.color}15`, border:`1px solid ${s.color}55`, borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:s.color, fontWeight:600 }}>
             🍐 {s.label} × {order.qty[s.key]} 箱
           </span>
         ))}
-        <span style={{ background:"#F0E8D0", borderRadius:"0.45rem", padding:"0.18rem 0.55rem",
-          fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#7A5520", fontWeight:600 }}>
-          共 {total} 箱
-        </span>
+        <span style={{ background:"#F0E8D0", borderRadius:"0.45rem", padding:"0.18rem 0.55rem", fontFamily:"'Noto Sans TC'", fontSize:"0.8rem", color:"#7A5520", fontWeight:600 }}>共 {total} 箱</span>
       </div>
 
-      {order.note && (
-        <div style={{ marginTop:"0.45rem", fontSize:"0.78rem", color:"#9A7040",
-          fontFamily:"'Noto Sans TC'", fontStyle:"italic" }}>💬 {order.note}</div>
-      )}
+      {order.note && <div style={{ marginTop:"0.45rem", fontSize:"0.78rem", color:"#9A7040", fontFamily:"'Noto Sans TC'", fontStyle:"italic" }}>💬 {order.note}</div>}
 
       {order.trackingNumber && (
         <div style={{ marginTop:"0.55rem", display:"flex", alignItems:"center", gap:"0.45rem", flexWrap:"wrap" }}>
-         <span style={{ fontSize:"0.78rem", color:"#5A7A5A", fontFamily:"monospace",
-            background:"#E8F0E8", padding:"0.18rem 0.55rem", borderRadius:"0.4rem" }}>
+         <span onClick={() => onTrack(order.trackingNumber)} style={{ fontSize:"0.78rem", color:"#5A7A5A", fontFamily:"monospace", background:"#E8F0E8", padding:"0.18rem 0.55rem", borderRadius:"0.4rem", cursor:"pointer" }}>
             📦 {order.trackingNumber}
           </span>
-          <a href={`${KERRY_URL}?no=${order.trackingNumber}`} target="_blank" rel="noopener noreferrer"
-            style={{ fontSize:"0.76rem", color:"#D4850A", fontFamily:"'Noto Sans TC'",
-              fontWeight:600, textDecoration:"none", background:"#FFF0D0",
-              padding:"0.18rem 0.55rem", borderRadius:"0.4rem", border:"1px solid #E8C070" }}>
-             🔍 查詢貨況
-          </a>
+          <button onClick={() => onTrack(order.trackingNumber)}
+            style={{ fontSize:"0.76rem", color:"#D4850A", fontFamily:"'Noto Sans TC'", fontWeight:600, border:"1px solid #E8C070", background:"#FFF0D0", padding:"0.18rem 0.55rem", borderRadius:"0.4rem", cursor:"pointer" }}>
+             🔍 查詢進度
+          </button>
         </div>
       )}
 
       <div style={{ marginTop:"0.65rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>
-          建立 {createdDate}{shippedDate && `　寄出 ${shippedDate}`}
-        </span>
+        <span style={{ fontSize:"0.72rem", color:"#B0905A", fontFamily:"'Noto Sans TC'" }}>建立 {createdDate}{shippedDate && `　寄出 ${shippedDate}`}</span>
         {!order.shipped && (
-          <button onClick={() => onShip(order)} style={{ background:"linear-gradient(135deg,#D4850A,#B8600A)",
-            color:"white", border:"none", borderRadius:"0.55rem", padding:"0.38rem 0.85rem",
-            fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.8rem", cursor:"pointer" }}>
-            📷 上傳貨運單
-          </button>
+          <button onClick={() => onShip(order)} style={{ background:"linear-gradient(135deg,#D4850A,#B8600A)", color:"white", border:"none", borderRadius:"0.55rem", padding:"0.38rem 0.85rem", fontFamily:"'Noto Sans TC'", fontWeight:700, fontSize:"0.8rem", cursor:"pointer" }}>📷 上傳貨運單</button>
         )}
       </div>
     </div>
@@ -675,6 +708,7 @@ export default function App() {
         {filtered.map(order => (
           <OrderCard key={order.id} order={order}
             onShip={o => setModal({ type:"ship", order:o })}
+            onTrack={no => setModal({ type:"track", no })} // 👈 新增這行
             onEdit={o => setModal({ type:"edit", order:o })}
             onDelete={id => setModal({ type:"confirmDelete", id })} />
         ))}
@@ -708,6 +742,11 @@ export default function App() {
           message="確定刪除這筆訂單？此操作無法復原。"
           onConfirm={() => handleDeleteConfirmed(modal.id)}
           onCancel={() => setModal(null)} />
+      )}
+      {modal?.type === "track" && (
+      <Modal title={`物流追蹤 — ${modal.no}`} onClose={() => setModal(null)}>
+      <TrackingModal trackingNumber={modal.no} />
+        </Modal>
       )}
     </div>
   );
